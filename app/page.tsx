@@ -13,6 +13,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Magnetic } from "@/components/magnetic";
 import { TechStack, Tools } from "@/components/tech-grid";
+import { ExperienceList } from "@/components/experience";
 
 type Entry = {
   title: string;
@@ -90,6 +91,7 @@ function Nav() {
         </Link>
 
         <nav className="hidden gap-8 text-sm uppercase tracking-[0.15em] md:flex">
+          <Link href="#experience" className="link-underline transition-colors hover:text-[#043360]">Experience</Link>
           <Link href="#work" className="link-underline transition-colors hover:text-[#043360]">Work</Link>
           <Link href="#stack" className="link-underline transition-colors hover:text-[#043360]">Stack</Link>
           <Link href="/library" className="link-underline transition-colors hover:text-[#043360]">Library</Link>
@@ -196,9 +198,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 02 — Work */}
-        <section id="work" className="scroll-mt-24 px-6 md:px-10">
-          <SectionHeading index="02 / Selected Work">Work</SectionHeading>
+        {/* 02 — Experience */}
+        <section id="experience" className="scroll-mt-24 px-6 md:px-10">
+          <SectionHeading index="02 / Where I've Worked">Experience</SectionHeading>
+          <ExperienceList />
+        </section>
+
+        {/* 03 — Work */}
+        <section id="work" className="scroll-mt-24 px-6 pt-24 md:px-10 md:pt-32">
+          <SectionHeading index="03 / Selected Work">Work</SectionHeading>
           <div className="mt-8">
             {WORK.map((entry, i) => (
               <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
@@ -206,9 +214,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 03 — Projects */}
+        {/* 04 — Projects */}
         <section className="px-6 pt-24 md:px-10 md:pt-32">
-          <SectionHeading index="03 / Things I Built">Projects</SectionHeading>
+          <SectionHeading index="04 / Things I Built">Projects</SectionHeading>
           <div className="mt-8">
             {PROJECTS.map((entry, i) => (
               <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
@@ -216,9 +224,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 04 — Stack */}
+        {/* 05 — Stack */}
         <section id="stack" className="scroll-mt-24 px-6 py-24 md:px-10 md:py-32">
-          <SectionHeading index="04 / Tools of the Trade">Stack</SectionHeading>
+          <SectionHeading index="05 / Tools of the Trade">Stack</SectionHeading>
           <div className="mt-14 flex flex-col gap-16">
             <Reveal>
               <TechStack />
@@ -234,9 +242,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 05 — Beyond the code */}
+        {/* 06 — Beyond the code */}
         <section className="px-6 pb-24 md:px-10 md:pb-32">
-          <SectionHeading index="05 / Beyond the Code">Travel</SectionHeading>
+          <SectionHeading index="06 / Beyond the Code">Travel</SectionHeading>
           <Reveal>
             <p className="mt-14 max-w-2xl text-2xl leading-snug text-muted-foreground">
               Some places I&apos;ve been. Open a folder.
@@ -251,11 +259,11 @@ export default function Home() {
           </RevealGroup>
         </section>
 
-        {/* 06 — Contact */}
+        {/* 07 — Contact */}
         <section id="contact" className="scroll-mt-24 border-t border-border px-6 py-24 md:px-10 md:py-32">
           <Reveal>
             <p className="mb-10 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-              06 / Contact
+              07 / Contact
             </p>
           </Reveal>
           <Reveal>
