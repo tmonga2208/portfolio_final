@@ -4,7 +4,6 @@ const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
 
 const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
-const NOW_PLAYING_ENDPOINT = "https://api.spotify.com/v1/me/player/currently-playing";
 const PLAYLIST_ENDPOINT = "https://api.spotify.com/v1/playlists";
 
 interface SpotifyToken {
@@ -33,39 +32,53 @@ interface SpotifyTrack {
     };
 }
 
-interface NowPlayingResponse {
-    is_playing: boolean;
-    item: SpotifyTrack;
-    progress_ms: number;
-}
-
-interface PlaylistTrack {
-    track: SpotifyTrack;
-}
-
-interface PlaylistResponse {
-    name: string;
-    tracks: {
-        items: PlaylistTrack[];
-        total: number;
-    };
-}
+// Spotify tokens live for an hour, so refreshing on every call burns quota for
+// nothing. Cache across invocations and expire a minute early for clock skew.
+const TOKEN_SKEW_MS = 60_000;
+let cachedToken: { access_token: string; expires_at: number } | null = null;
+let inFlight: Promise<SpotifyToken> | null = null;
 
 export async function getAccessToken(): Promise<SpotifyToken> {
-    const response = await fetch(TOKEN_ENDPOINT, {
-        method: "POST",
-        headers: {
-            Authorization: `Basic ${basic}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-            grant_type: "refresh_token",
-            refresh_token: refresh_token || "",
-        }),
-        cache: "no-store",
-    });
+    if (cachedToken && Date.now() < cachedToken.expires_at - TOKEN_SKEW_MS) {
+        return {
+            access_token: cachedToken.access_token,
+            token_type: "Bearer",
+            expires_in: Math.floor((cachedToken.expires_at - Date.now()) / 1000),
+        };
+    }
 
-    return response.json();
+    // Collapse concurrent refreshes into a single request.
+    inFlight ??= (async () => {
+        try {
+            const response = await fetch(TOKEN_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    Authorization: `Basic ${basic}`,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    grant_type: "refresh_token",
+                    refresh_token: refresh_token || "",
+                }),
+                cache: "no-store",
+            });
+
+            if (!response.ok) {
+                throw new Error(`Spotify token refresh failed: ${response.status}`);
+            }
+
+            const token: SpotifyToken = await response.json();
+            cachedToken = {
+                access_token: token.access_token,
+                expires_at: Date.now() + token.expires_in * 1000,
+            };
+            return token;
+        } finally {
+            inFlight = null;
+        }
+    })();
+
+    return inFlight;
 }
 
 export async function getNowPlaying() {
