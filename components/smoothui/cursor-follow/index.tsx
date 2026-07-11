@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "motion/react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,7 +11,6 @@ export type CursorFollowProps = {
   className?: string;
 };
 
-const CIRCLE_SIZE = 16;
 const MIN_BUBBLE_WIDTH = 40;
 const BUBBLE_HEIGHT = 40;
 const TEXT_PADDING = 32;
@@ -34,29 +33,41 @@ const CursorFollow: React.FC<CursorFollowProps> = ({
   const springX = useSpring(x, { stiffness: 350, damping: 40 });
   const springY = useSpring(y, { stiffness: 350, damping: 40 });
 
-  // Calculate bubble width and height
   const bubbleWidth = cursorText
     ? Math.max(textWidth + TEXT_PADDING, MIN_BUBBLE_WIDTH)
-    : CIRCLE_SIZE;
-  const bubbleHeight = cursorText ? BUBBLE_HEIGHT : CIRCLE_SIZE;
+    : MIN_BUBBLE_WIDTH;
 
-  // Update target position on mouse move
-  useEffect(() => {
-    if (!cursorText) {
-      // The dot *is* the cursor, so it stays centred on the pointer.
-      x.set(mouseX - bubbleWidth / 2);
-      y.set(mouseY - bubbleHeight / 2);
-      return;
+  /**
+   * Hang the label below-right of the pointer rather than under it, flipping at
+   * the viewport edges so it stays on screen and readable.
+   *
+   * `jump` snaps the spring instead of animating it. On the hover that first
+   * reveals the label, the spring is still parked wherever it was left — the
+   * origin, on a fresh page — and easing from there sends the label flying in
+   * from the top-left corner. Snap it onto the pointer instead, and only then
+   * let the spring take over.
+   */
+  const place = (px: number, py: number, width: number, jump = false) => {
+    const flipX = px + LABEL_OFFSET + width > window.innerWidth;
+    const flipY = py + LABEL_OFFSET + BUBBLE_HEIGHT > window.innerHeight;
+
+    const targetX = flipX ? px - LABEL_OFFSET - width : px + LABEL_OFFSET;
+    const targetY = flipY ? py - LABEL_OFFSET - BUBBLE_HEIGHT : py + LABEL_OFFSET;
+
+    x.set(targetX);
+    y.set(targetY);
+
+    if (jump) {
+      springX.jump(targetX);
+      springY.jump(targetY);
     }
+  };
 
-    // Once it grows into a label, centring would park the pointer on top of the text.
-    // Hang it below-right instead, flipping at the viewport edges so it stays readable.
-    const flipX = mouseX + LABEL_OFFSET + bubbleWidth > window.innerWidth;
-    const flipY = mouseY + LABEL_OFFSET + bubbleHeight > window.innerHeight;
-
-    x.set(flipX ? mouseX - LABEL_OFFSET - bubbleWidth : mouseX + LABEL_OFFSET);
-    y.set(flipY ? mouseY - LABEL_OFFSET - bubbleHeight : mouseY + LABEL_OFFSET);
-  }, [mouseX, mouseY, bubbleWidth, bubbleHeight, cursorText, x, y]);
+  // Steady-state following once the label is up.
+  useEffect(() => {
+    place(mouseX, mouseY, bubbleWidth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mouseX, mouseY, bubbleWidth]);
 
   // Pre-measure text width before showing bubble
   useEffect(() => {
@@ -71,132 +82,99 @@ const CursorFollow: React.FC<CursorFollowProps> = ({
     }
   }, [pendingText, cursorText]);
 
-  // Handlers for child hover
+  const clear = () => {
+    setCursorText(null);
+    setPendingText(null);
+  };
+
+  // Read the label off the nearest labelled ancestor, not off the exact element
+  // under the pointer: the cells wrap a logo, and hovering that logo would
+  // otherwise find no data-cursor-text and drop the label mid-hover.
+  const show = (target: EventTarget | null) => {
+    const labelled = (target as HTMLElement | null)?.closest?.("[data-cursor-text]");
+    const text = labelled?.getAttribute("data-cursor-text") ?? null;
+
+    if (!text) {
+      clear();
+      return;
+    }
+    if (text === cursorText) return;
+    setPendingText(text);
+  };
+
   const handleMouseOver = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const text = target.getAttribute("data-cursor-text");
-    if (text) {
-      setPendingText(text);
-    }
+    // Take the coordinates off the event rather than the tracked state: on the
+    // very first move the state hasn't propagated yet, and the label would mount
+    // at the origin.
+    if (!cursorText) place(e.clientX, e.clientY, bubbleWidth, true);
+    show(e.target);
   };
-  const handleMouseOut = () => {
-    setCursorText(null);
-    setPendingText(null);
-  };
-  const handleFocus = (e: React.FocusEvent) => {
-    const target = e.target as HTMLElement;
-    const text = target.getAttribute("data-cursor-text");
-    if (text) {
-      setPendingText(text);
-    }
-  };
-  const handleBlur = () => {
-    setCursorText(null);
-    setPendingText(null);
-  };
+  const handleFocus = (e: React.FocusEvent) => show(e.target);
 
   return (
     // biome-ignore lint/a11y/noNoninteractiveElementInteractions: Interactive cursor tracking widget requires mouse events
     <div
       className={`relative h-full w-full ${className}`}
-      onBlur={handleBlur}
+      onBlur={clear}
       onFocus={handleFocus}
-      onMouseOut={handleMouseOut}
+      // mouseout fires on every hop between child nodes, so clearing there made
+      // the label flicker. mouseover re-resolves the label (or clears it), and
+      // mouseleave handles actually leaving the section.
+      onMouseLeave={clear}
       onMouseOver={handleMouseOver}
       role="application"
-      style={{ minHeight: 300, cursor: "none" }}
+      // No cursor: "none" here. The dot used to stand in for the pointer, so
+      // hiding the real one was load-bearing; with only the label left, hiding it
+      // would leave this section with no cursor at all.
+      style={{ minHeight: 300 }}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: Interactive cursor tracking widget requires focus
       tabIndex={0}
     >
       {children}
-      <motion.div
-        animate={{
-          opacity: 1,
-          scale: 1,
-          transition: { duration: 0.32, ease: "easeInOut" },
-        }}
-        className="pointer-events-none fixed z-50"
-        exit={{ opacity: 0, scale: 0.7 }}
-        initial={{ opacity: 0, scale: 0.7 }}
-        style={{ left: 0, top: 0, x: springX, y: springY }}
-      >
-        <motion.div
-          animate={
-            cursorText
-              ? {
-                  width: bubbleWidth,
-                  height: 40,
-                  borderRadius: 20,
-                  background: "var(--color-brand, #6366f1)",
-                  color: "#fff",
-                  paddingLeft: 16,
-                  paddingRight: 16,
-                  minWidth: 40,
-                  minHeight: 32,
-                  scale: 1.1,
-                }
-              : {
-                  width: CIRCLE_SIZE,
-                  height: CIRCLE_SIZE,
-                  borderRadius: 999,
-                  background: "var(--color-brand, #6366f1)",
-                  color: "#fff",
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                  minWidth: CIRCLE_SIZE,
-                  minHeight: CIRCLE_SIZE,
-                  scale: 1,
-                }
-          }
-          className="flex items-center justify-center font-medium text-xs shadow-lg"
-          layout
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-            zIndex: 1,
-            boxShadow: "0 2px 8px 0 rgba(0,0,0,0.10)",
-          }}
-          transition={{ duration: 0.32, ease: "easeInOut" }}
-        >
-          {cursorText && (
-            <motion.span
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, filter: "blur(8px)" }}
-              initial={{ opacity: 0, filter: "blur(8px)" }}
-              style={{
-                whiteSpace: "nowrap",
-                width: "100%",
-                textAlign: "center",
-                color: "#fff",
-              }}
-              transition={{ duration: 0.28, delay: 0.1, ease: "easeInOut" }}
-            >
-              {cursorText}
-            </motion.span>
-          )}
-        </motion.div>
-        {/* Hidden span for pre-measuring text width */}
-        {(pendingText || cursorText) && (
-          <span
-            ref={measureRef}
+
+      <AnimatePresence>
+        {cursorText && (
+          <motion.div
+            animate={{ opacity: 1, scale: 1 }}
+            className="pointer-events-none fixed z-50 flex items-center justify-center rounded-full font-medium text-xs shadow-lg"
+            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             style={{
-              position: "absolute",
-              visibility: "hidden",
-              pointerEvents: "none",
+              left: 0,
+              top: 0,
+              x: springX,
+              y: springY,
+              width: bubbleWidth,
+              height: BUBBLE_HEIGHT,
+              background: "var(--color-brand, #6366f1)",
+              color: "#fff",
               whiteSpace: "nowrap",
-              fontSize: "0.75rem",
-              fontWeight: 500,
-              paddingLeft: 16,
-              paddingRight: 16,
-              fontFamily: "inherit",
+              boxShadow: "0 2px 8px 0 rgba(0,0,0,0.10)",
             }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
           >
-            {pendingText || cursorText}
-          </span>
+            {cursorText}
+          </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
+
+      {/* Off-screen copy, measured to size the bubble before it's shown. */}
+      {(pendingText || cursorText) && (
+        <span
+          ref={measureRef}
+          style={{
+            position: "fixed",
+            visibility: "hidden",
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            fontFamily: "inherit",
+          }}
+        >
+          {pendingText || cursorText}
+        </span>
+      )}
     </div>
   );
 };
