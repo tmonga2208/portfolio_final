@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 import { Player } from "@/components/player";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { Owl } from "@/components/owl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +38,6 @@ export default function RootLayout({
       >
         <ScrollProgress />
         <Player />
-        <Owl />
         {children}
       </body>
     </html>
