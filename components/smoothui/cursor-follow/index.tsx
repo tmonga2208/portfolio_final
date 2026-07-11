@@ -15,6 +15,8 @@ const CIRCLE_SIZE = 16;
 const MIN_BUBBLE_WIDTH = 40;
 const BUBBLE_HEIGHT = 40;
 const TEXT_PADDING = 32;
+/** Gap between the pointer and the label bubble, so the two never overlap. */
+const LABEL_OFFSET = 18;
 
 const CursorFollow: React.FC<CursorFollowProps> = ({
   children,
@@ -40,9 +42,21 @@ const CursorFollow: React.FC<CursorFollowProps> = ({
 
   // Update target position on mouse move
   useEffect(() => {
-    x.set(mouseX - bubbleWidth / 2);
-    y.set(mouseY - bubbleHeight / 2);
-  }, [mouseX, mouseY, bubbleWidth, bubbleHeight, x, y]);
+    if (!cursorText) {
+      // The dot *is* the cursor, so it stays centred on the pointer.
+      x.set(mouseX - bubbleWidth / 2);
+      y.set(mouseY - bubbleHeight / 2);
+      return;
+    }
+
+    // Once it grows into a label, centring would park the pointer on top of the text.
+    // Hang it below-right instead, flipping at the viewport edges so it stays readable.
+    const flipX = mouseX + LABEL_OFFSET + bubbleWidth > window.innerWidth;
+    const flipY = mouseY + LABEL_OFFSET + bubbleHeight > window.innerHeight;
+
+    x.set(flipX ? mouseX - LABEL_OFFSET - bubbleWidth : mouseX + LABEL_OFFSET);
+    y.set(flipY ? mouseY - LABEL_OFFSET - bubbleHeight : mouseY + LABEL_OFFSET);
+  }, [mouseX, mouseY, bubbleWidth, bubbleHeight, cursorText, x, y]);
 
   // Pre-measure text width before showing bubble
   useEffect(() => {

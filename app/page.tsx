@@ -1,719 +1,285 @@
-"use client"
-import { ArrowUpRight, Github, Linkedin, MenuIcon, XIcon } from "lucide-react";
-import Image from "next/image";
+"use client";
+
+import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
+import { motion } from "framer-motion";
+import ClickSpark from "@/components/ClickSpark";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
-import ClickSpark from '@/components/ClickSpark';
-import { SmoothCursor } from "@/components/ui/smooth-cursor"
-import CursorFollow from "@/components/smoothui/cursor-follow";
-import { motion, LayoutGroup } from "framer-motion";
-import { useIsMobile } from "@/hooks/use-mobile";
-import FlowingMenu from "@/components/FlowingMenu";
-import FadeContent from "@/components/FadeContent";
 import { LinkPreview } from "@/components/ui/link-preview";
 import { IOSFolder } from "@/components/ios-folder";
 import { blogData } from "@/types/blog";
+import { Hero } from "@/components/hero";
+import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
+import { SectionHeading } from "@/components/section-heading";
+import { Magnetic } from "@/components/magnetic";
+import { TechStack, Tools } from "@/components/tech-grid";
 
+type Entry = {
+  title: string;
+  url: string;
+  period: string;
+  blurb: string;
+  images: { src: string; alt: string }[];
+};
+
+const WORK: Entry[] = [
+  {
+    title: "Chauhan Sports",
+    url: "https://www.chauhansports.com",
+    period: "August 2025 — Present",
+    blurb:
+      "Designed and developed the official website for Chauhan Sports, delivering a professional and brand-aligned digital presence. Led the complete brand identity process, including logo design, professional visiting cards, and visual guidelines. Built and managed the brand’s social media presence, creating a strong and consistent online identity across platforms.",
+    images: [
+      { src: "/chauhan/image.png", alt: "Chauhan Sports - Screenshot 1" },
+      { src: "/chauhan/img2.png", alt: "Chauhan Sports - Screenshot 2" },
+      { src: "/chauhan/img3.png", alt: "Chauhan Sports - Screenshot 3" },
+    ],
+  },
+  {
+    title: "The Resolute Mind",
+    url: "https://www.theresolutemind.in",
+    period: "January 2025 — Present",
+    blurb:
+      "Designed and developed the official website for The Resolute Mind, delivering a professional, brand-aligned digital presence. Focused on clean visual design, intuitive user experience, and responsive layouts to ensure clarity, accessibility, and consistent performance across devices.",
+    images: [
+      { src: "/resolute/i1.png", alt: "The Resolute Mind - Screenshot 1" },
+      { src: "/resolute/i4.png", alt: "The Resolute Mind - Screenshot 2" },
+      { src: "/resolute/i3.png", alt: "The Resolute Mind - Screenshot 3" },
+    ],
+  },
+];
+
+const PROJECTS: Entry[] = [
+  {
+    title: "Forgestack",
+    url: "https://forgestack.vercel.app/",
+    period: "January 2025 — Present",
+    blurb:
+      "ForgeStack is a custom full-stack starter framework I designed and built to streamline modern web development. It provides a structured, scalable foundation with a guided CLI setup, opinionated best practices, and seamless integration of modern tools—helping developers move from setup to building real features faster.",
+    images: [
+      { src: "/forge/i1.png", alt: "Forgestack - Screenshot 1" },
+      { src: "/forge/i2.png", alt: "Forgestack - Screenshot 2" },
+      { src: "/forge/i3.png", alt: "Forgestack - Screenshot 3" },
+    ],
+  },
+  {
+    title: "SubPIP",
+    url: "https://subpip.vercel.app/",
+    period: "January 2025",
+    blurb:
+      "Watch videos with a floating window that stays on top of other applications, complete with playback controls and seamlessly integrated subtitles for a superior viewing experience.",
+    images: [
+      { src: "/subpip/i1.png", alt: "SubPIP - Screenshot 1" },
+      { src: "/subpip/i2.png", alt: "SubPIP - Screenshot 2" },
+      { src: "/subpip/i3.png", alt: "SubPIP - Screenshot 3" },
+    ],
+  },
+];
+
+function Nav() {
+  return (
+    <motion.header
+      initial={{ opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-md"
+    >
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-10">
+        <Link href="/" className="text-xl font-bold tracking-tight">
+          Tarun <span className="text-[#043360]">Monga</span>
+        </Link>
+
+        <nav className="hidden gap-8 text-sm uppercase tracking-[0.15em] md:flex">
+          <Link href="#work" className="link-underline transition-colors hover:text-[#043360]">Work</Link>
+          <Link href="#stack" className="link-underline transition-colors hover:text-[#043360]">Stack</Link>
+          <Link href="/library" className="link-underline transition-colors hover:text-[#043360]">Library</Link>
+          <Link href="#contact" className="link-underline transition-colors hover:text-[#043360]">Contact</Link>
+        </nav>
+
+        <div className="flex gap-4">
+          {[
+            { href: "https://github.com/tmonga2208", Icon: Github, label: "GitHub" },
+            { href: "https://www.linkedin.com/in/tarun-monga-b00008181/", Icon: Linkedin, label: "LinkedIn" },
+          ].map(({ href, Icon, label }) => (
+            <motion.div
+              key={label}
+              whileHover={{ y: -3, scale: 1.12 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              <Link href={href} aria-label={label} className="block transition-colors hover:text-[#043360]">
+                <Icon className="size-5" />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.header>
+  );
+}
+
+/** One work/project entry: meta column on the left, screenshots on the right. */
+function EntryRow({ entry, number }: { entry: Entry; number: string }) {
+  return (
+    <Reveal>
+      <article className="entry-row group flex flex-col gap-8 border-b border-border py-14 md:flex-row md:gap-12">
+        <div className="flex shrink-0 flex-col justify-center md:w-[320px]">
+          <span className="mb-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            {number}
+          </span>
+          <div className="mb-3 flex items-center gap-2">
+            <svg
+              className="entry-icon size-5 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg>
+            <LinkPreview url={entry.url} className="text-3xl font-bold">
+              {entry.title}
+            </LinkPreview>
+          </div>
+          <p className="mb-6 text-sm text-muted-foreground">{entry.period}</p>
+          <p className="text-lg leading-relaxed text-foreground/80">{entry.blurb}</p>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <AutoScrollCarousel images={entry.images} />
+        </div>
+      </article>
+    </Reveal>
+  );
+}
 
 export default function Home() {
-  const isMobile = useIsMobile();
-
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: false,
-      offset: 100,
-      mirror: true,
-      anchorPlacement: 'top-center',
-    });
-  }, []);
-
-
-  const [mobileImages, setMobileImages] = useState([
-    { src: "/img1.JPG", alt: "Left Top", id: "left-top" },    // 0
-    { src: "/img2.jpg", alt: "Left Bottom", id: "left-bottom" }, // 1
-    { src: "/img5.jpeg", alt: "Center", id: "center" },     // 2 (Center)
-    { src: "/img3.JPG", alt: "Right Top", id: "right-top" },   // 3
-    { src: "/img4.jpg", alt: "Right Bottom", id: "right-bottom" } // 4
-  ]);
-
-  const handleMobileImageClick = (index: number) => {
-    if (index === 2) return;
-    setMobileImages(prev => {
-      const newImages = [...prev];
-      [newImages[index], newImages[2]] = [newImages[2], newImages[index]];
-      return newImages;
-    });
-  };
-
   return (
-    <div>
-      {isMobile ?
-        <div className="font-crimson">
-          <ClickSpark
-            sparkColor='black'
-            sparkSize={10}
-            sparkRadius={15}
-            sparkCount={8}
-            duration={400}
-          >
-            {/*Header*/}
-            <header className="flex justify-between mx-4 my-2 z-50">
-              <div>
-                <div className="mx-4 text-center">
-                  <p className="flex flex-col text-2xl font-bold">
-                    Tarun <span className="text-4xl font-extrabold text-[#043360]">Monga</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4 ">
-                <Link href="https://github.com/tmonga2208" className="hover:text-[#043360] transition-colors">
-                  <Github />
-                </Link>
-                <Link href="https://www.linkedin.com/in/tarun-monga-b00008181/" className="hover:text-[#043360] transition-colors">
-                  <Linkedin />
-                </Link>
-              </div>
-            </header>
-            <section className="relative w-full h-[500px] mt-8 overflow-hidden bg-[#FBFBFB] z-0">
-              <LayoutGroup>
-                <div className="flex justify-center items-center h-full gap-4 relative">
-                  {/* Left Column - Partial View */}
-                  <div className="flex flex-col gap-4 w-[45%] opacity-90 -ml-16 scale-90 blur-[1px]">
-                    <motion.div
-                      layoutId={mobileImages[0].id}
-                      className="relative h-[220px] rounded-[32px] overflow-hidden shadow-lg transform -rotate-2 cursor-pointer transition-transform hover:scale-105"
-                      onClick={() => handleMobileImageClick(0)}
-                    >
-                      <Image src={mobileImages[0].src} alt={mobileImages[0].alt} fill className="object-cover" />
-                    </motion.div>
-                    <motion.div
-                      layoutId={mobileImages[1].id}
-                      className="relative h-[180px] rounded-[32px] overflow-hidden shadow-lg transform -rotate-1 cursor-pointer transition-transform hover:scale-105"
-                      onClick={() => handleMobileImageClick(1)}
-                    >
-                      <Image src={mobileImages[1].src} alt={mobileImages[1].alt} fill className="object-cover" />
-                    </motion.div>
-                  </div>
+    <ClickSpark sparkColor="#043360" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+      <Nav />
 
-                  {/* Center Column - Main Focus */}
-                  <motion.div
-                    layoutId={mobileImages[2].id}
-                    className="relative z-20 shrink-0 w-[65%] h-[420px] rounded-[40px] overflow-hidden shadow-2xl border-[6px] border-white transform scale-105 transition-all duration-300"
-                    onClick={() => handleMobileImageClick(2)}
-                  >
-                    <Image src={mobileImages[2].src} alt={mobileImages[2].alt} fill className="object-cover" priority />
-                  </motion.div>
+      <main className="mx-auto max-w-[1600px] font-crimson">
+        <Hero />
 
-                  {/* Right Column - Partial View */}
-                  <div className="flex flex-col gap-4 w-[45%] opacity-90 -mr-16 scale-90 blur-[1px]">
-                    <motion.div
-                      layoutId={mobileImages[3].id}
-                      className="relative h-[180px] rounded-[32px] overflow-hidden shadow-lg transform rotate-1 cursor-pointer transition-transform hover:scale-105"
-                      onClick={() => handleMobileImageClick(3)}
-                    >
-                      <Image src={mobileImages[3].src} alt={mobileImages[3].alt} fill className="object-cover" />
-                    </motion.div>
-                    <motion.div
-                      layoutId={mobileImages[4].id}
-                      className="relative h-[220px] rounded-[32px] overflow-hidden shadow-lg transform rotate-2 cursor-pointer transition-transform hover:scale-105"
-                      onClick={() => handleMobileImageClick(4)}
-                    >
-                      <Image src={mobileImages[4].src} alt={mobileImages[4].alt} fill className="object-cover" />
-                    </motion.div>
-                  </div>
-                </div>
-              </LayoutGroup>
-            </section>
-            <section>
-              <div>
-                <div className="rounded-2xl p-8">
-                  <h1 className="text-4xl font-bold mb-6 flex justify-center items-center">
-                    Hi, I'm&nbsp;<span className="text-[#043360]">Tarun Monga</span>
-                  </h1>
-                  <p className="text-xl mb-4">
-                    I'm a <span className="font-semibold italic">software engineer</span>. I work in projects across various domains.
-                  </p>
-                  <p className="text-muted-foreground">
-                    I have experience in frontend & design systems. Primarily, I work with React, Figma, Typescript, Vite, Tailwind.
-                  </p>
-                </div>
-              </div>
-            </section>
-            <section>
-              <div className="my-4 flex flex-col w-full items-center text-xl p-8">
-                <div className="flex flex-col gap-6">
-                  <p>Outside of code, I <span className="font-semibold italic text-[#043360]">swim</span> to clear my head. I also try to read books.</p>
-                  <p>
-                    Sometimes it works.
-                    Sometimes I just buy more books.
-                    Growth is a process.
-                  </p>
-                  <p>Also I Like To <span className="font-semibold italic text-[#043360]">Travel</span>. Some Places I've Been To Include</p>
-                  <div className="flex">
-                    {blogData.map((blog) => (
-                      <IOSFolder key={blog.id} blog={blog} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-            <section>
-              <h2 className="flex justify-center items-center text-5xl font-bold my-2 text-[#043360]">
-                Work
-              </h2>
-              <div className="flex flex-col gap-8 mb-4 border-t border-b border-border py-12">
-                <div className="flex flex-col items-center justify-center w-full shrink-0">
-                  <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
-                    <LinkPreview url="https://theresolutemind.in/" className="text-3xl font-bold">The Resolute Mind</LinkPreview>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-6">January 2025 - Present</p>
-                  <p className="text-lg leading-relaxed mx-4">
-                    Designed and developed the official website for The Resolute Mind, delivering a professional, brand-aligned digital presence. Focused on clean visual design, intuitive user experience, and responsive layouts to ensure clarity, accessibility, and consistent performance across devices.
-                  </p>
-                </div>
-
-                <AutoScrollCarousel
-                  images={[
-                    { src: "/resolute/i1.png", alt: "The Resolute Mind - Screenshot 1" },
-                    { src: "/resolute/i4.png", alt: "The Resolute Mind - Screenshot 2" },
-                    { src: "/resolute/i3.png", alt: "The Resolute Mind - Screenshot 3" },
-                  ]}
-                />
-              </div>
-            </section>
-            <section>
-              <h2 className="flex justify-center items-center text-5xl font-bold my-2 text-[#043360]">
-                Projects
-              </h2>
-              {/* Forgestack Project */}
-              <div className="flex flex-col gap-8 mb-4 border-t border-b border-border py-12">
-                <div className="flex flex-col justify-center w-full items-center shrink-0">
-                  <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
-                    <LinkPreview url="https://forgestack.vercel.app/" className="text-3xl font-bold">Forgestack</LinkPreview>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-6">January 2025 - Present</p>
-                  <p className="text-lg leading-relaxed mx-4">
-                    ForgeStack is a custom full-stack starter framework I designed and built to streamline modern web development. It provides a structured, scalable foundation with a guided CLI setup, opinionated best practices, and seamless integration of modern tools—helping developers move from setup to building real features faster.
-                  </p>
-                </div>
-
-                <AutoScrollCarousel
-                  images={[
-                    { src: "/forge/i1.png", alt: "Forgestack - Screenshot 1" },
-                    { src: "/forge/i2.png", alt: "Forgestack - Screenshot 2" },
-                    { src: "/forge/i3.png", alt: "Forgestack - Screenshot 3" },
-                  ]}
-                />
-              </div>
-
-              {/* SubPIP Project */}
-              <div className="flex flex-col gap-8 mb-4 border-t border-b border-border py-12">
-                <div className="flex flex-col justify-center w-full items-center shrink-0">
-                  <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
-                    <LinkPreview url="https://subpip.vercel.app/" className="text-3xl font-bold">SubPIP</LinkPreview>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-6">January 2025</p>
-                  <p className="text-lg leading-relaxed mx-4">
-                    Watch videos with a floating window that stays on top of other applications, complete with playback controls and seamlessly integrated subtitles for a superior viewing experience.
-                  </p>
-                </div>
-
-                <AutoScrollCarousel
-                  images={[
-                    { src: "/subpip/i1.png", alt: "SubPIP - Screenshot 1" },
-                    { src: "/subpip/i2.png", alt: "SubPIP - Screenshot 2" },
-                    { src: "/subpip/i3.png", alt: "SubPIP - Screenshot 3" },
-                  ]}
-                />
-              </div>
-            </section>
-            <section className="mt-4 mx-auto">
-              <h2 className="mx-8 text-5xl font-bold mb-16 text-[#043360]">
-                Modern Tech Stack
-              </h2>
-              <CursorFollow>
-                <div className="grid grid-cols-2 gap-0 border border-border rounded-2xl overflow-hidden">
-                  {/* React */}
-                  <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="React">
-                    <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><path fillRule="evenodd" clipRule="evenodd" d="M4.5 1.93782C4.70129 1.82161 4.99472 1.7858 5.41315 1.91053C5.83298 2.03567 6.33139 2.31073 6.87627 2.73948C7.01136 2.84578 7.14803 2.96052 7.28573 3.08331C6.86217 3.53446 6.44239 4.04358 6.03752 4.60092C5.35243 4.67288 4.70164 4.78186 4.09916 4.92309C4.06167 4.74244 4.03064 4.56671 4.00612 4.39656C3.90725 3.71031 3.91825 3.14114 4.01979 2.71499C4.12099 2.29025 4.29871 2.05404 4.5 1.93782ZM7.49466 1.95361C7.66225 2.08548 7.83092 2.22804 7.99999 2.38067C8.16906 2.22804 8.33773 2.08548 8.50532 1.95361C9.10921 1.47842 9.71982 1.12549 10.3012 0.952202C10.8839 0.778496 11.4838 0.7738 12 1.0718C12.5161 1.3698 12.812 1.89169 12.953 2.48322C13.0936 3.07333 13.0932 3.77858 12.9836 4.53917C12.9532 4.75024 12.9141 4.9676 12.8665 5.19034C13.0832 5.26044 13.291 5.33524 13.489 5.41444C14.2025 5.69983 14.8134 6.05217 15.2542 6.46899C15.696 6.8868 16 7.404 16 8C16 8.596 15.696 9.11319 15.2542 9.53101C14.8134 9.94783 14.2025 10.3002 13.489 10.5856C13.291 10.6648 13.0832 10.7396 12.8665 10.8097C12.9141 11.0324 12.9532 11.2498 12.9837 11.4608C13.0932 12.2214 13.0936 12.9267 12.953 13.5168C12.812 14.1083 12.5161 14.6302 12 14.9282C11.4839 15.2262 10.8839 15.2215 10.3012 15.0478C9.71984 14.8745 9.10923 14.5216 8.50534 14.0464C8.33775 13.9145 8.16906 13.7719 7.99999 13.6193C7.83091 13.7719 7.66223 13.9145 7.49464 14.0464C6.89075 14.5216 6.28014 14.8745 5.69879 15.0478C5.11605 15.2215 4.51613 15.2262 3.99998 14.9282C3.48383 14.6302 3.18794 14.1083 3.047 13.5168C2.9064 12.9267 2.90674 12.2214 3.01632 11.4608C3.04673 11.2498 3.08586 11.0324 3.13351 10.8097C2.91679 10.7395 2.709 10.6648 2.511 10.5856C1.79752 10.3002 1.18658 9.94783 0.745833 9.53101C0.304028 9.11319 0 8.596 0 8C0 7.404 0.304028 6.8868 0.745833 6.46899C1.18658 6.05217 1.79752 5.69983 2.511 5.41444C2.709 5.33524 2.9168 5.26044 3.13352 5.19034C3.08587 4.9676 3.04675 4.75024 3.01634 4.53917C2.90676 3.77858 2.90642 3.07332 3.04702 2.48321C3.18796 1.89169 3.48385 1.3698 4 1.0718C4.51615 0.773798 5.11607 0.778495 5.69881 0.952201C6.28016 1.12549 6.89077 1.47841 7.49466 1.95361ZM7.36747 4.51025C7.57735 4.25194 7.78881 4.00927 7.99999 3.78356C8.21117 4.00927 8.42263 4.25194 8.63251 4.51025C8.42369 4.50346 8.21274 4.5 8 4.5C7.78725 4.5 7.5763 4.50345 7.36747 4.51025ZM8.71425 3.08331C9.13781 3.53447 9.55759 4.04358 9.96246 4.60092C10.6475 4.67288 11.2983 4.78186 11.9008 4.92309C11.9383 4.74244 11.9693 4.56671 11.9939 4.39657C12.0927 3.71031 12.0817 3.14114 11.9802 2.71499C11.879 2.29025 11.7013 2.05404 11.5 1.93782C11.2987 1.82161 11.0053 1.7858 10.5868 1.91053C10.167 2.03568 9.66859 2.31073 9.12371 2.73948C8.98862 2.84578 8.85196 2.96052 8.71425 3.08331ZM8 5.5C8.48433 5.5 8.95638 5.51885 9.41188 5.55456C9.67056 5.93118 9.9229 6.33056 10.1651 6.75C10.4072 7.16944 10.6269 7.58766 10.8237 7.99998C10.6269 8.41232 10.4072 8.83055 10.165 9.25C9.92288 9.66944 9.67053 10.0688 9.41185 10.4454C8.95636 10.4812 8.48432 10.5 8 10.5C7.51567 10.5 7.04363 10.4812 6.58813 10.4454C6.32945 10.0688 6.0771 9.66944 5.83494 9.25C5.59277 8.83055 5.37306 8.41232 5.17624 7.99998C5.37306 7.58765 5.59275 7.16944 5.83492 6.75C6.07708 6.33056 6.32942 5.93118 6.5881 5.55456C7.04361 5.51884 7.51566 5.5 8 5.5ZM11.0311 6.25C11.1375 6.43423 11.2399 6.61864 11.3385 6.80287C11.4572 6.49197 11.5616 6.18752 11.6515 5.89178C11.3505 5.82175 11.0346 5.75996 10.706 5.70736C10.8163 5.8848 10.9247 6.06576 11.0311 6.25ZM11.0311 9.75C11.1374 9.56576 11.2399 9.38133 11.3385 9.19709C11.4572 9.50801 11.5617 9.81246 11.6515 10.1082C11.3505 10.1782 11.0346 10.24 10.7059 10.2926C10.8162 10.1152 10.9247 9.93424 11.0311 9.75ZM11.9249 7.99998C12.2051 8.62927 12.4362 9.24738 12.6151 9.83977C12.7903 9.78191 12.958 9.72092 13.1176 9.65708C13.7614 9.39958 14.2488 9.10547 14.5671 8.80446C14.8843 8.50445 15 8.23243 15 8C15 7.76757 14.8843 7.49555 14.5671 7.19554C14.2488 6.89453 13.7614 6.60042 13.1176 6.34292C12.958 6.27907 12.7903 6.21808 12.6151 6.16022C12.4362 6.7526 12.2051 7.37069 11.9249 7.99998ZM9.96244 11.3991C10.6475 11.3271 11.2983 11.2181 11.9008 11.0769C11.9383 11.2576 11.9694 11.4333 11.9939 11.6034C12.0928 12.2897 12.0817 12.8589 11.9802 13.285C11.879 13.7098 11.7013 13.946 11.5 14.0622C11.2987 14.1784 11.0053 14.2142 10.5868 14.0895C10.167 13.9643 9.66861 13.6893 9.12373 13.2605C8.98863 13.1542 8.85196 13.0395 8.71424 12.9167C9.1378 12.4655 9.55758 11.9564 9.96244 11.3991ZM8.63249 11.4898C8.42262 11.7481 8.21116 11.9907 7.99999 12.2164C7.78881 11.9907 7.57737 11.7481 7.36749 11.4897C7.57631 11.4965 7.78726 11.5 8 11.5C8.21273 11.5 8.42367 11.4965 8.63249 11.4898ZM4.96891 9.75C5.07528 9.93424 5.18375 10.1152 5.29404 10.2926C4.9654 10.24 4.64951 10.1782 4.34844 10.1082C4.43833 9.81246 4.54276 9.508 4.66152 9.19708C4.76005 9.38133 4.86254 9.56575 4.96891 9.75ZM6.03754 11.3991C5.35244 11.3271 4.70163 11.2181 4.09914 11.0769C4.06165 11.2576 4.03062 11.4333 4.0061 11.6034C3.90723 12.2897 3.91823 12.8589 4.01977 13.285C4.12097 13.7098 4.29869 13.946 4.49998 14.0622C4.70127 14.1784 4.9947 14.2142 5.41313 14.0895C5.83296 13.9643 6.33137 13.6893 6.87625 13.2605C7.01135 13.1542 7.14802 13.0395 7.28573 12.9167C6.86217 12.4655 6.4424 11.9564 6.03754 11.3991ZM4.07507 7.99998C3.79484 8.62927 3.56381 9.24737 3.38489 9.83977C3.20969 9.78191 3.042 9.72092 2.88239 9.65708C2.23864 9.39958 1.75123 9.10547 1.43294 8.80446C1.11571 8.50445 1 8.23243 1 8C1 7.76757 1.11571 7.49555 1.43294 7.19554C1.75123 6.89453 2.23864 6.60042 2.88239 6.34292C3.042 6.27907 3.2097 6.21808 3.3849 6.16022C3.56383 6.75261 3.79484 7.37069 4.07507 7.99998ZM4.66152 6.80287C4.54277 6.49197 4.43835 6.18752 4.34846 5.89178C4.64952 5.82175 4.96539 5.75996 5.29402 5.70736C5.18373 5.8848 5.07526 6.06576 4.96889 6.25C4.86253 6.43423 4.76005 6.61864 4.66152 6.80287ZM9.25 8C9.25 8.69036 8.69036 9.25 8 9.25C7.30964 9.25 6.75 8.69036 6.75 8C6.75 7.30965 7.30964 6.75 8 6.75C8.69036 6.75 9.25 7.30965 9.25 8Z" fill="#149ECA"></path>
-                      <defs>
-                        <rect width="64" height="64" fill="white"></rect>
-                      </defs></svg>
-                  </div>
-
-                  {/* Next.js */}
-                  <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="Next.js">
-                    <div className="text-6xl font-light tracking-tight">
-                      <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><g clipPath="url(#clip0_53_108)">
-                        <circle cx="8" cy="8" r="7.375" fill="black" stroke="var(--ds-gray-1000)" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"></circle>
-                        <path d="M10.63 11V5" stroke="url(#paint0_linear_53_108_r_1o_)" strokeWidth="1.25" strokeMiterlimit="1.41421"></path>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M5.995 5.00087V5H4.745V11H5.995V6.96798L12.3615 14.7076C12.712 14.4793 13.0434 14.2242 13.353 13.9453L5.99527 5.00065L5.995 5.00087Z" fill="url(#paint1_linear_53_108_r_1o_)"></path>
-                      </g>
-                        <defs>
-                          <linearGradient id="paint0_linear_53_108_r_1o_" x1="11.13" y1="5" x2="11.13" y2="11" gradientUnits="userSpaceOnUse">
-                            <stop stopColor="white"></stop>
-                            <stop offset="0.609375" stopColor="white" stopOpacity="0.57"></stop>
-                            <stop offset="0.796875" stopColor="white" stopOpacity="0"></stop>
-                            <stop offset="1" stopColor="white" stopOpacity="0"></stop>
-                          </linearGradient>
-                          <linearGradient id="paint1_linear_53_108_r_1o_" x1="9.9375" y1="9.0625" x2="13.5574" y2="13.3992" gradientUnits="userSpaceOnUse">
-                            <stop stopColor="white"></stop>
-                            <stop offset="1" stopColor="white" stopOpacity="0"></stop>
-                          </linearGradient>
-                          <clipPath id="clip0_53_108">
-                            <rect width="16" height="16" fill="red"></rect>
-                          </clipPath>
-                        </defs></svg>
-                    </div>
-                  </div>
-
-                  {/* MongoDB */}
-                  <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="MongoDB">
-                    <svg className="w-32 h-32" viewBox="0 -183 512 512" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fillRule="evenodd"> <path d="M476.713 60.463c-.46.092-.922 1.107-.922 1.66-.092 3.692-.184 13.474-.184 20.118 0 .185.276.554.553.554 1.384.092 4.706.184 7.567.184 3.968 0 6.275-.553 7.568-1.106 3.321-1.662 4.89-5.261 4.89-9.23 0-8.95-6.275-12.365-15.596-12.365-.646-.092-2.49-.092-3.876.185zm23.81 41.25c0-9.136-6.737-14.212-18.918-14.212-.554 0-4.43-.092-5.353.092-.277.093-.645.278-.645.555 0 6.551-.093 16.98.184 21.04.184 1.753 1.477 4.245 3.046 4.983 1.66.923 5.444 1.107 8.028 1.107 7.29 0 13.658-4.06 13.658-13.565zm-42.634-46.325c.922 0 3.69.276 10.796.276 6.737 0 12.089-.184 18.641-.184 8.028 0 19.102 2.86 19.102 14.857 0 5.906-4.153 10.613-9.597 12.92-.276.092-.276.276 0 .368 7.751 1.939 14.581 6.737 14.581 15.78 0 8.86-5.537 14.489-13.566 17.996-4.891 2.122-10.981 2.86-17.164 2.86-4.707 0-17.349-.553-24.362-.368-.738-.278.646-3.6 1.291-4.153 1.662-.093 2.953-.185 4.707-.739 2.492-.645 2.768-1.384 3.137-5.167.185-3.23.185-14.674.185-22.794 0-11.166.093-18.733 0-22.424-.092-2.86-1.107-3.784-3.137-4.338-1.57-.276-4.153-.646-6.276-.922-.462-.462 1.107-3.6 1.662-3.968zm-53.248 57.399c2.216 1.752 6.553 2.49 10.429 2.49 4.983 0 9.966-.921 14.765-5.26 4.891-4.428 8.305-11.257 8.305-22.146 0-10.429-3.968-18.919-12.089-23.901-4.614-2.862-10.52-4.06-17.349-4.06-2.03 0-3.968.092-5.167.645-.278.185-.923 1.015-.923 1.476-.185 1.846-.185 16.057-.185 24.363 0 8.582 0 20.579.185 21.963 0 1.385.645 3.507 2.03 4.43zm-20.948-57.4c1.754 0 8.49.277 11.72.277 5.815 0 9.967-.276 20.948-.276 9.228 0 16.98 2.491 22.517 7.197 6.736 5.814 10.244 13.843 10.244 23.624 0 13.935-6.368 21.964-12.736 26.578-6.366 4.706-14.672 7.474-26.484 7.474-6.275 0-17.072-.184-26.024-.277h-.092c-.461-.83.738-4.06 1.476-4.152 2.4-.277 3.046-.37 4.246-.83 1.937-.739 2.307-1.754 2.584-5.168.276-6.368.184-14.027.184-22.702 0-6.182.092-18.272-.093-22.148-.276-3.229-1.66-4.06-4.429-4.614-1.384-.276-3.23-.646-5.813-.922-.37-.647 1.291-3.507 1.752-4.06z" fill="#8E714E"></path> <path d="M272.033 116.385c-2.307-.277-3.968-.645-5.998-1.568-.277-.185-.739-1.107-.739-1.477-.184-3.23-.184-12.458-.184-18.64 0-4.984-.83-9.321-2.953-12.366-2.492-3.508-6.09-5.537-10.705-5.537-4.06 0-9.505 2.768-14.027 6.644-.092.092-.83.739-.738-.277 0-1.015.185-3.045.277-4.43.093-1.292-.646-1.937-.646-1.937-2.953 1.476-11.258 3.414-14.304 3.69-2.214.463-2.768 2.585-.46 3.323h.092c2.49.738 4.152 1.569 5.443 2.4.923.738.831 1.753.831 2.584.092 6.92.092 17.533-.184 23.347-.092 2.307-.738 3.137-2.4 3.506l.185-.092c-1.292.277-2.307.553-3.876.738-.554.554-.554 3.507 0 4.153 1.015 0 6.367-.277 10.798-.277 6.09 0 9.228.277 10.796.277.646-.738.831-3.507.462-4.153-1.754-.092-3.046-.276-4.245-.646-1.661-.37-2.123-1.199-2.216-3.137-.183-4.892-.183-15.227-.183-22.24 0-1.938.553-2.861 1.106-3.415 2.123-1.845 5.538-3.137 8.583-3.137 2.953 0 4.89.923 6.367 2.123 2.03 1.66 2.676 4.06 2.953 5.813.461 3.968.277 11.812.277 18.641 0 3.691-.277 4.614-1.66 5.075-.647.277-2.308.647-4.246.83-.646.647-.461 3.508 0 4.154 2.676 0 5.814-.277 10.428-.277 5.721 0 9.413.277 10.89.277.46-.554.645-3.23.276-3.969zm25.562-35.25c-4.89 0-7.936 3.783-7.936 9.688 0 5.999 2.676 12.92 10.243 12.92 1.292 0 3.692-.554 4.798-1.846 1.754-1.66 2.954-4.983 2.954-8.49 0-7.659-3.784-12.273-10.059-12.273zm-.646 40.787c-1.845 0-3.138.554-3.968 1.016-3.876 2.49-5.629 4.89-5.629 7.752 0 2.675 1.015 4.797 3.23 6.643 2.676 2.307 6.367 3.415 11.073 3.415 9.413 0 13.566-5.076 13.566-10.058 0-3.508-1.754-5.815-5.352-7.106-2.584-1.108-7.29-1.662-12.92-1.662zm.646 23.994c-5.629 0-9.69-1.2-13.196-3.876-3.415-2.584-4.891-6.46-4.891-9.136 0-.738.185-2.769 1.846-4.614 1.014-1.108 3.23-3.23 8.49-6.829.184-.092.276-.184.276-.37 0-.184-.185-.369-.369-.46-4.337-1.661-5.629-4.338-5.999-5.814v-.185c-.091-.554-.276-1.107.555-1.661.646-.461 1.569-1.015 2.583-1.66 1.569-.924 3.23-1.939 4.245-2.77.185-.184.185-.368.185-.553 0-.185-.185-.37-.37-.461-6.458-2.123-9.688-6.922-9.688-14.12 0-4.706 2.122-8.951 5.905-11.627 2.584-2.03 9.044-4.522 13.289-4.522h.277c4.337.092 6.736 1.015 10.15 2.215 1.846.646 3.6.922 6 .922 3.598 0 5.167-1.107 6.458-2.398.093.184.278.646.37 1.845.092 1.2-.277 2.953-1.2 4.245-.738 1.015-2.399 1.754-4.06 1.754h-.462c-1.661-.185-2.4-.37-2.4-.37l-.368.185c-.092.185 0 .369.092.646l.093.185c.184.83.553 3.321.553 3.968 0 7.567-3.045 10.888-6.275 13.38-3.138 2.307-6.736 3.783-10.797 4.153-.092 0-.46 0-1.292.092-.461 0-1.107.093-1.2.093h-.092c-.738.184-2.583 1.107-2.583 2.675 0 1.384.83 3.046 4.798 3.323.83.092 1.66.092 2.584.185 5.26.368 11.812.83 14.857 1.845 4.245 1.568 6.921 5.352 6.921 9.874 0 6.83-4.89 13.197-13.011 17.164-3.968 1.754-7.937 2.677-12.274 2.677zm52.6-64.32c-1.937 0-3.691.46-4.983 1.383-3.598 2.215-5.444 6.645-5.444 13.104 0 12.09 6.09 20.58 14.765 20.58 2.584 0 4.614-.739 6.367-2.215 2.676-2.216 4.061-6.645 4.061-12.828 0-11.996-5.999-20.025-14.765-20.025zm1.662 39.496c-15.688 0-21.317-11.535-21.317-22.332 0-7.567 3.045-13.381 9.135-17.534 4.338-2.676 9.506-4.152 14.12-4.152 11.996 0 20.394 8.582 20.394 20.948 0 8.397-3.322 15.041-9.69 19.102-3.045 2.03-8.305 3.968-12.643 3.968h.001zM187.411 81.595c-1.938 0-3.691.461-4.984 1.384-3.598 2.215-5.444 6.645-5.444 13.104 0 12.09 6.09 20.58 14.765 20.58 2.584 0 4.614-.739 6.368-2.215 2.675-2.216 4.06-6.645 4.06-12.828 0-11.996-5.906-20.025-14.765-20.025zm1.661 39.497c-15.688 0-21.317-11.535-21.317-22.332 0-7.567 3.045-13.381 9.135-17.534 4.338-2.676 9.506-4.152 14.12-4.152 11.997 0 20.394 8.582 20.394 20.948 0 8.397-3.322 15.041-9.69 19.102-2.953 2.03-8.213 3.968-12.642 3.968zm-105.478-.923c-.185-.276-.37-1.107-.277-2.122 0-.739.185-1.2.277-1.384 1.938-.278 2.953-.555 4.06-.831 1.846-.462 2.584-1.476 2.676-3.783.278-5.537.278-16.058.185-23.348v-.185c0-.83 0-1.846-1.015-2.584-1.477-.922-3.23-1.752-5.537-2.4-.83-.275-1.384-.737-1.292-1.29 0-.554.554-1.2 1.754-1.385 3.045-.277 10.98-2.214 14.118-3.599.185.184.462.739.462 1.477l-.092 1.014c-.093 1.016-.185 2.216-.185 3.415 0 .369.37.646.738.646.185 0 .37-.092.554-.185 5.906-4.614 11.258-6.275 14.026-6.275 4.523 0 8.03 2.123 10.706 6.552.184.278.369.37.646.37.184 0 .46-.092.553-.277 5.445-4.153 10.89-6.645 14.488-6.645 8.582 0 13.658 6.368 13.658 17.165 0 3.045 0 7.013-.092 10.613 0 3.229-.092 6.182-.092 8.305 0 .46.645 1.937 1.66 2.214 1.292.646 3.046.923 5.353 1.292h.092c.185.646-.184 3.045-.553 3.507-.554 0-1.385 0-2.307-.092a136.208 136.208 0 0 0-7.014-.185c-5.721 0-8.674.092-11.536.277-.183-.738-.276-2.953 0-3.507 1.662-.276 2.492-.554 3.508-.83 1.846-.554 2.307-1.385 2.4-3.784 0-1.753.368-16.703-.186-20.302-.553-3.691-3.322-8.028-9.413-8.028-2.307 0-5.905.923-9.412 3.598-.184.185-.37.646-.37.923v.093c.37 1.937.37 4.153.37 7.567v5.998c0 4.153-.093 8.029 0 10.981 0 2.031 1.2 2.492 2.215 2.862.554.091.922.184 1.384.276.83.185 1.661.37 2.953.646.185.37.185 1.569-.092 2.584-.093.554-.278.83-.37.923-3.137-.092-6.367-.185-11.073-.185-1.384 0-3.784.093-5.814.093-1.662 0-3.23.092-4.152.092-.093-.185-.278-.83-.278-1.846 0-.83.185-1.476.37-1.661.461-.092.83-.184 1.292-.184 1.106-.185 2.03-.37 2.952-.554 1.57-.461 2.123-1.292 2.215-3.322.277-4.614.554-17.81-.092-21.133-1.107-5.352-4.152-8.028-9.044-8.028-2.86 0-6.46 1.384-9.412 3.6-.462.368-.831 1.29-.831 2.121v5.445c0 6.644 0 14.95.092 18.549.093 1.106.461 2.399 2.584 2.86.462.092 1.2.277 2.123.37l1.66.276c.186.554.093 2.769-.276 3.507-.923 0-2.03-.092-3.323-.092-1.937-.093-4.429-.185-7.197-.185-3.23 0-5.537.092-7.383.185-1.292-.185-2.307-.185-3.414-.185z" fill="#442D22"></path> <path d="M35.053 142.317l-3.783-1.293s.462-19.286-6.46-20.67c-4.613-5.353.74-227.013 17.35-.739 0 0-5.722 2.86-6.737 7.752-1.108 4.799-.37 14.95-.37 14.95z" fill="#FFF"></path> <path d="M35.053 142.317l-3.783-1.293s.462-19.286-6.46-20.67c-4.613-5.353.74-227.013 17.35-.739 0 0-5.722 2.86-6.737 7.752-1.108 4.799-.37 14.95-.37 14.95z" fill="#A6A385"></path> <path d="M37.084 123.676s33.13-21.779 25.377-67.09c-7.474-32.943-25.1-43.74-27.038-47.893C33.301 5.74 31.27.573 31.27.573l1.385 91.634c0 .093-2.861 28.054 4.43 31.47" fill="#FFF"></path> <path d="M37.084 123.676s33.13-21.779 25.377-67.09c-7.474-32.943-25.1-43.74-27.038-47.893C33.301 5.74 31.27.573 31.27.573l1.385 91.634c0 .093-2.861 28.054 4.43 31.47" fill="#499D4A"></path> <path d="M29.333 124.875S-1.767 103.65.079 66.277C1.832 28.903 23.795 10.539 28.04 7.217c2.769-2.953 2.861-4.061 3.046-7.014 1.938 4.153 1.569 62.106 1.845 68.934.83 26.3-1.476 50.756-3.598 55.738z" fill="#FFF"></path> <path d="M29.333 124.875S-1.767 103.65.079 66.277C1.832 28.903 23.795 10.539 28.04 7.217c2.769-2.953 2.861-4.061 3.046-7.014 1.938 4.153 1.569 62.106 1.845 68.934.83 26.3-1.476 50.756-3.598 55.738z" fill="#58AA50"></path> </g> </g></svg>
-                  </div>
-
-                  {/* Figma */}
-                  <div className="aspect-square flex items-center justify-center border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="Figma">
-                    <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><path d="M8.00342 8C8.00342 7.29275 8.28437 6.61448 8.78447 6.11438C9.28456 5.61428 9.96284 5.33333 10.6701 5.33333C11.3773 5.33333 12.0556 5.61428 12.5557 6.11438C13.0558 6.61448 13.3368 7.29275 13.3368 8C13.3368 8.70724 13.0558 9.38552 12.5557 9.88562C12.0556 10.3857 11.3773 10.6667 10.6701 10.6667C9.96284 10.6667 9.28456 10.3857 8.78447 9.88562C8.28437 9.38552 8.00342 8.70724 8.00342 8Z" fill="#1ABCFE"></path>
-                      <path d="M2.66992 13.3333C2.66992 12.6261 2.95087 11.9478 3.45097 11.4477C3.95107 10.9476 4.62934 10.6667 5.33659 10.6667H8.00326V13.3333C8.00326 14.0406 7.7223 14.7189 7.22221 15.2189C6.72211 15.719 6.04383 16 5.33659 16C4.62934 16 3.95107 15.719 3.45097 15.2189C2.95087 14.7189 2.66992 14.0406 2.66992 13.3333Z" fill="#0ACF83"></path>
-                      <path d="M8.00342 0V5.33333H10.6701C11.3773 5.33333 12.0556 5.05238 12.5557 4.55228C13.0558 4.05219 13.3368 3.37391 13.3368 2.66667C13.3368 1.95942 13.0558 1.28115 12.5557 0.781049C12.0556 0.280952 11.3773 0 10.6701 0L8.00342 0Z" fill="#FF7262"></path>
-                      <path d="M2.67017 2.66667C2.67017 3.37391 2.95112 4.05219 3.45121 4.55228C3.95131 5.05238 4.62959 5.33333 5.33683 5.33333H8.0035V0H5.33683C4.62959 0 3.95131 0.280952 3.45121 0.781049C2.95112 1.28115 2.67017 1.95942 2.67017 2.66667Z" fill="#F24E1E"></path>
-                      <path d="M2.66992 8C2.66992 8.70724 2.95087 9.38552 3.45097 9.88562C3.95107 10.3857 4.62934 10.6667 5.33659 10.6667H8.00326V5.33333H5.33659C4.62934 5.33333 3.95107 5.61428 3.45097 6.11438C2.95087 6.61448 2.66992 7.29275 2.66992 8Z" fill="#A259FF"></path></svg>
-                  </div>
-
-                  {/* Vercel */}
-                  <div className="aspect-square flex items-center justify-center border-r border-border hover:bg-accent transition-colors p-8" data-cursor-text="Vercel">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L2 22h20L12 2z" />
-                      </svg>
-                      <span className="text-2xl font-semibold">Vercel</span>
-                    </div>
-                  </div>
-
-                  {/* TypeScript */}
-                  <div className="aspect-square flex items-center justify-center border-r border-border hover:bg-accent transition-colors p-8" data-cursor-text="TypeScript">
-                    <div className="text-6xl font-bold text-sky-600">TS</div>
-                  </div>
-
-                  {/* Tailwind */}
-                  <div className="aspect-square flex items-center justify-center hover:bg-accent transition-colors p-8" data-cursor-text="Tailwind">
-                    <svg className="w-24 h-24" viewBox="0 0 24 24" fill="oklch(71.5% 0.143 215.221)">
-                      <path d="M12 6C9.33 6 7.67 7.33 7 10C8 8.67 9.17 8.17 10.5 8.5C11.26 8.67 11.81 9.23 12.41 9.84C13.39 10.84 14.54 12 17 12C19.67 12 21.33 10.67 22 8C21 9.33 19.83 9.83 18.5 9.5C17.74 9.33 17.19 8.77 16.59 8.16C15.61 7.16 14.46 6 12 6M7 12C4.33 12 2.67 13.33 2 16C3 14.67 4.17 14.17 5.5 14.5C6.26 14.67 6.81 15.23 7.41 15.84C8.39 16.84 9.54 18 12 18C14.67 18 16.33 16.67 17 14C16 15.33 14.83 15.83 13.5 15.5C12.74 15.33 12.19 14.77 11.59 14.16C10.61 13.16 9.46 12 7 12Z" />
-                    </svg>
-                  </div>
-                  {/* Nodejs */}
-                  <div className="aspect-square flex items-center justify-center hover:bg-accent transition-colors p-8 border-r border-l" data-cursor-text="Node.js">
-                    <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><mask id="mask0_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                      <path d="M7.62322 0.101215L1.37744 3.72072C1.1435 3.85617 1 4.10623 1 4.37653V11.6206C1 11.8911 1.1435 12.141 1.37744 12.2764L7.62367 15.8987C7.85716 16.0338 8.14506 16.0338 8.37826 15.8987L14.6234 12.2764C14.8562 12.141 15 11.8909 15 11.6206V4.37653C15 4.10623 14.8562 3.85617 14.622 3.72072L8.37767 0.101215C8.26055 0.0337871 8.13009 0 7.99963 0C7.86917 0 7.73871 0.0337871 7.62159 0.101215" fill="white"></path>
-                    </mask>
-                      <g mask="url(#mask0_872_3158)">
-                        <path d="M21.3115 3.10613L3.71197 -5.55525L-5.31201 12.9276L12.2871 21.5894L21.3115 3.10613Z" fill="url(#paint0_linear_872_3158)"></path>
-                      </g>
-                      <mask id="mask1_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                        <path d="M1.15454 12.0805C1.21429 12.1584 1.289 12.2258 1.37692 12.2764L6.73468 15.3836L7.62714 15.8986C7.76057 15.976 7.91267 16.0087 8.06211 15.9976C8.11192 15.9936 8.16173 15.9842 8.21036 15.9703L14.7977 3.86019C14.7473 3.80511 14.6883 3.75897 14.6222 3.72027L10.5325 1.34915L8.37077 0.100323C8.30939 0.0646001 8.24282 0.0392964 8.17507 0.0214348L1.15454 12.0805Z" fill="white"></path>
-                      </mask>
-                      <g mask="url(#mask1_872_3158)">
-                        <path d="M-6.45459 5.66793L5.97248 22.555L22.4075 10.3636L9.97968 -6.52305L-6.45459 5.66793Z" fill="url(#paint1_linear_872_3158)"></path>
-                      </g>
-                      <mask id="mask2_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                        <path d="M7.92494 0.00417044C7.82013 0.0145897 7.71769 0.0473349 7.62325 0.101217L1.39526 3.7103L8.11099 15.9916C8.20439 15.9782 8.29631 15.947 8.37933 15.8988L14.6251 12.2764C14.8178 12.1642 14.9498 11.9743 14.9898 11.759L8.14361 0.0165236C8.0932 0.00655088 8.0428 0.00134277 7.99091 0.00134277C7.97016 0.00134277 7.9494 0.00238306 7.92865 0.00431807" fill="white"></path>
-                      </mask>
-                      <g mask="url(#mask2_872_3158)">
-                        <path d="M1.39502 0.00134277V15.9919H14.987V0.00134277H1.39502Z" fill="url(#paint2_linear_872_3158)"></path>
-                      </g>
-                      <defs>
-                        <linearGradient id="paint0_linear_872_3158" x1="12.5064" y1="-1.23818" x2="3.42452" y2="17.2146" gradientUnits="userSpaceOnUse">
-                          <stop offset="0.3" stopColor="#3E863D"></stop>
-                          <stop offset="0.5" stopColor="#55934F"></stop>
-                          <stop offset="0.8" stopColor="#5AAD45"></stop>
-                        </linearGradient>
-                        <linearGradient id="paint1_linear_872_3158" x1="-0.166585" y1="14.2083" x2="16.3156" y2="2.07868" gradientUnits="userSpaceOnUse">
-                          <stop offset="0.57" stopColor="#3E863D"></stop>
-                          <stop offset="0.72" stopColor="#619857"></stop>
-                          <stop offset="1" stopColor="#76AC64"></stop>
-                        </linearGradient>
-                        <linearGradient id="paint2_linear_872_3158" x1="1.39961" y1="7.99708" x2="14.9896" y2="7.99708" gradientUnits="userSpaceOnUse">
-                          <stop offset="0.16" stopColor="#6BBF47"></stop>
-                          <stop offset="0.38" stopColor="#79B461"></stop>
-                          <stop offset="0.47" stopColor="#75AC64"></stop>
-                          <stop offset="0.7" stopColor="#659E5A"></stop>
-                          <stop offset="0.9" stopColor="#3E863D"></stop>
-                        </linearGradient>
-                      </defs></svg>
-                  </div>
-                </div>
-              </CursorFollow>
-            </section>
-            <section className="flex items-center justify-center mt-12">
-              <h4 className="mx-8 text-5xl font-bold">
-                <Link href="mailto:tarunmonga2208@gmail.com">Get in touch<ArrowUpRight className="inline" /></Link><span className="text-[#043360] italic">. Let's talk</span>
-              </h4>
-            </section>
-          </ClickSpark>
-        </div>
-        :
-        <div>
-          <div className="min-h-screen bg-background p-2 font-crimson">
-            {/* Header */}
-            <header className="flex items-center justify-between mb-12">
-              <div className="mx-4 text-center">
-                <p className="flex flex-col text-2xl font-bold">
-                  Tarun <span className="text-4xl font-extrabold text-[#043360]">Monga</span>
+        {/* 01 — About */}
+        <section className="px-6 py-24 md:px-10 md:py-32">
+          <SectionHeading index="01 / About">About</SectionHeading>
+          <div className="mt-14 grid gap-12 md:grid-cols-[1fr_1fr]">
+            <Reveal>
+              <p className="text-3xl leading-tight md:text-5xl">
+                I&apos;m a <span className="italic text-[#043360]">software engineer</span> working
+                across frontend and design systems — building interfaces that stay clear under
+                pressure.
+              </p>
+            </Reveal>
+            <RevealGroup className="flex flex-col gap-6 text-xl text-muted-foreground md:pt-4">
+              <RevealItem>
+                <p>
+                  Primarily React, TypeScript, Vite and Tailwind, with Figma alongside. I care about
+                  the parts most people never see: the type scale, the spacing rhythm, the state you
+                  forgot to design for.
                 </p>
-              </div>
-              <div className="flex gap-6">
-                <p className="cursor-pointer hover:text-[#043360] transition-colors">Home</p>
-                <p className="cursor-pointer hover:text-[#043360] transition-colors">About</p>
-              </div>
-              <div className="flex gap-4 mx-4">
-                <Link href="https://github.com/tmonga2208" className="hover:text-[#043360] transition-colors">
-                  <Github />
-                </Link>
-                <Link href="https://www.linkedin.com/in/tarun-monga-b00008181/" className="hover:text-[#043360] transition-colors">
-                  <Linkedin />
-                </Link>
-              </div>
-            </header>
-            <ClickSpark
-              sparkColor='black'
-              sparkSize={10}
-              sparkRadius={15}
-              sparkCount={8}
-              duration={400}
-            >
-              {/* Bento Grid Layout */}
-              <div className="grid grid-cols-[220px_1fr_220px] gap-6 max-w-7xl mx-auto">
-                {/* Left Column - Images */}
-                <div className="flex flex-col gap-6">
-                  <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src="/img1.JPG"
-                      alt="Portfolio image 1"
-                      fill
-                      className="object-cover"
-                      data-aos="fade-right"
-                      data-aos-offset="200"
-                      data-aos-duration="500"
-                      data-aos-easing="ease-in-back"
-                    />
-                  </div>
-                  <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src="/img2.jpg"
-                      alt="Portfolio image 2"
-                      fill
-                      className="object-cover"
-                      data-aos="fade-right"
-                      data-aos-offset="200"
-                      data-aos-duration="1000"
-                      data-aos-easing="ease-in-back"
-                    />
-                  </div>
-                </div>
-
-                {/* Center Column - Content */}
-                <div className="flex flex-col gap-6">
-                  {/* Introduction Card */}
-                  <FadeContent blur={true} duration={1000} initialOpacity={0}>
-                    <div className="rounded-2xl p-8">
-                      <h1 className="text-4xl font-bold mb-6 flex justify-center items-center">
-                        Hi, I'm&nbsp;<span className="text-[#043360]">Tarun Monga</span>
-                      </h1>
-                      <p className="text-2xl mb-4">
-                        I'm a <span className="font-semibold italic">software engineer</span>. I work in projects across various domains.
-                      </p>
-                      <p className="text-muted-foreground text-xl">
-                        I have experience in frontend & design systems. Primarily, I work with React, Figma, Typescript, Vite, Tailwind.
-                      </p>
-                    </div>
-                  </FadeContent>
-
-                  {/* Hero Image */}
-                  <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src="/img5.jpeg"
-                      alt="Hero image"
-                      fill
-                      className="object-cover"
-                      data-aos="fade-up"
-                    />
-                  </div>
-                </div>
-
-                {/* Right Column - Images */}
-                <div className="flex flex-col gap-6">
-                  <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src="/img3.JPG"
-                      alt="Portfolio image 3"
-                      fill
-                      className="object-cover"
-                      data-aos="fade-left"
-                      data-aos-offset="200"
-                      data-aos-duration="1000"
-                      data-aos-easing="ease-in-back"
-                    />
-                  </div>
-                  <div className="relative aspect-3/4 overflow-hidden rounded-2xl border border-border">
-                    <Image
-                      src="/img4.jpg"
-                      alt="Portfolio image 4"
-                      fill
-                      className="object-cover"
-                      data-aos="fade-left"
-                      data-aos-offset="200"
-                      data-aos-duration="500"
-                      data-aos-easing="ease-in-back"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="my-12 flex flex-col w-full items-center text-2xl">
-                <div className="flex flex-col gap-6">
-                  <p>Outside of code, I <span className="font-semibold italic text-[#043360]">swim</span> to clear my head. I also try to read books.</p>
-                  <p>
-                    Sometimes it works.
-                    Sometimes I just buy more books.
-                    Growth is a process.
-                  </p>
-                  <p>Also I Like To <span className="font-semibold italic text-[#043360]">Travel</span>. Some Places I've Been To Include</p>
-                  <div className="flex">
-                    {blogData.map((blog) => (
-                      <IOSFolder key={blog.id} blog={blog} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {/* Work Section */}
-              <div className="mt-24 max-w-7xl mx-auto">
-                <h2 className="flex justify-center items-center text-5xl font-bold mb-16 text-[#043360]">
-                  Work
-                </h2>
-
-                {/* The Resolute Mind Project */}
-                <div className="flex gap-8 mb-24 border-t border-b border-border py-12">
-                  <div className="flex flex-col justify-center w-[300px] shrink-0">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                      </svg>
-                      <LinkPreview url="https://www.theresolutemind.in" className="text-3xl font-bold">The Resolute Mind</LinkPreview>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-6">January 2025 - Present</p>
-                    <p className="text-lg leading-relaxed">
-                      Designed and developed the official website for The Resolute Mind, delivering a professional, brand-aligned digital presence. Focused on clean visual design, intuitive user experience, and responsive layouts to ensure clarity, accessibility, and consistent performance across devices.
-                    </p>
-                  </div>
-
-                  <AutoScrollCarousel
-                    images={[
-                      { src: "/resolute/i1.png", alt: "The Resolute Mind - Screenshot 1" },
-                      { src: "/resolute/i4.png", alt: "The Resolute Mind - Screenshot 2" },
-                      { src: "/resolute/i3.png", alt: "The Resolute Mind - Screenshot 3" },
-                    ]}
-                  />
-                </div>
-
-                {/* Projects Section */}
-                <h2 className="flex justify-center items-center text-5xl font-bold mb-16 text-[#043360]">
-                  Projects
-                </h2>
-
-                {/* Forgestack Project */}
-                <div className="flex gap-8 mb-24 border-t border-b border-border py-12">
-                  <div className="flex flex-col justify-center w-[300px] shrink-0">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                      </svg>
-                      <LinkPreview url="https://forgestack.vercel.app/" className="text-3xl font-bold">Forgestack</LinkPreview>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-6">January 2025 - Present</p>
-                    <p className="text-lg leading-relaxed">
-                      ForgeStack is a custom full-stack starter framework I designed and built to streamline modern web development. It provides a structured, scalable foundation with a guided CLI setup, opinionated best practices, and seamless integration of modern tools—helping developers move from setup to building real features faster.
-                    </p>
-                  </div>
-
-                  <AutoScrollCarousel
-                    images={[
-                      { src: "/forge/i1.png", alt: "Forgestack - Screenshot 1" },
-                      { src: "/forge/i2.png", alt: "Forgestack - Screenshot 2" },
-                      { src: "/forge/i3.png", alt: "Forgestack - Screenshot 3" },
-                    ]}
-                  />
-                </div>
-
-                {/* SubPIP Project */}
-                <div className="flex gap-8 mb-24 border-t border-b border-border py-12">
-                  <div className="flex flex-col justify-center w-[300px] shrink-0">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                      </svg>
-                      <LinkPreview url="https://subpip.vercel.app/" className="text-3xl font-bold">SubPIP</LinkPreview>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-6">January 2025</p>
-                    <p className="text-lg leading-relaxed">
-                      Watch videos with a floating window that stays on top of other applications, complete with playback controls and seamlessly integrated subtitles for a superior viewing experience.
-                    </p>
-                  </div>
-
-                  <AutoScrollCarousel
-                    images={[
-                      { src: "/subpip/i1.png", alt: "SubPIP - Screenshot 1" },
-                      { src: "/subpip/i2.png", alt: "SubPIP - Screenshot 2" },
-                      { src: "/subpip/i3.png", alt: "SubPIP - Screenshot 3" },
-                    ]}
-                  />
-                </div>
-              </div>
-              <section className="mt-24 mx-auto">
-                <h2 className="flex justify-center items-center text-5xl font-bold mb-16 text-[#043360]">
-                  Modern Tech Stack
-                </h2>
-                <CursorFollow>
-                  <div className="grid grid-cols-4 gap-0 border border-border rounded-2xl overflow-hidden">
-                    {/* React */}
-                    <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="React">
-                      <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><path fillRule="evenodd" clipRule="evenodd" d="M4.5 1.93782C4.70129 1.82161 4.99472 1.7858 5.41315 1.91053C5.83298 2.03567 6.33139 2.31073 6.87627 2.73948C7.01136 2.84578 7.14803 2.96052 7.28573 3.08331C6.86217 3.53446 6.44239 4.04358 6.03752 4.60092C5.35243 4.67288 4.70164 4.78186 4.09916 4.92309C4.06167 4.74244 4.03064 4.56671 4.00612 4.39656C3.90725 3.71031 3.91825 3.14114 4.01979 2.71499C4.12099 2.29025 4.29871 2.05404 4.5 1.93782ZM7.49466 1.95361C7.66225 2.08548 7.83092 2.22804 7.99999 2.38067C8.16906 2.22804 8.33773 2.08548 8.50532 1.95361C9.10921 1.47842 9.71982 1.12549 10.3012 0.952202C10.8839 0.778496 11.4838 0.7738 12 1.0718C12.5161 1.3698 12.812 1.89169 12.953 2.48322C13.0936 3.07333 13.0932 3.77858 12.9836 4.53917C12.9532 4.75024 12.9141 4.9676 12.8665 5.19034C13.0832 5.26044 13.291 5.33524 13.489 5.41444C14.2025 5.69983 14.8134 6.05217 15.2542 6.46899C15.696 6.8868 16 7.404 16 8C16 8.596 15.696 9.11319 15.2542 9.53101C14.8134 9.94783 14.2025 10.3002 13.489 10.5856C13.291 10.6648 13.0832 10.7396 12.8665 10.8097C12.9141 11.0324 12.9532 11.2498 12.9837 11.4608C13.0932 12.2214 13.0936 12.9267 12.953 13.5168C12.812 14.1083 12.5161 14.6302 12 14.9282C11.4839 15.2262 10.8839 15.2215 10.3012 15.0478C9.71984 14.8745 9.10923 14.5216 8.50534 14.0464C8.33775 13.9145 8.16906 13.7719 7.99999 13.6193C7.83091 13.7719 7.66223 13.9145 7.49464 14.0464C6.89075 14.5216 6.28014 14.8745 5.69879 15.0478C5.11605 15.2215 4.51613 15.2262 3.99998 14.9282C3.48383 14.6302 3.18794 14.1083 3.047 13.5168C2.9064 12.9267 2.90674 12.2214 3.01632 11.4608C3.04673 11.2498 3.08586 11.0324 3.13351 10.8097C2.91679 10.7395 2.709 10.6648 2.511 10.5856C1.79752 10.3002 1.18658 9.94783 0.745833 9.53101C0.304028 9.11319 0 8.596 0 8C0 7.404 0.304028 6.8868 0.745833 6.46899C1.18658 6.05217 1.79752 5.69983 2.511 5.41444C2.709 5.33524 2.9168 5.26044 3.13352 5.19034C3.08587 4.9676 3.04675 4.75024 3.01634 4.53917C2.90676 3.77858 2.90642 3.07332 3.04702 2.48321C3.18796 1.89169 3.48385 1.3698 4 1.0718C4.51615 0.773798 5.11607 0.778495 5.69881 0.952201C6.28016 1.12549 6.89077 1.47841 7.49466 1.95361ZM7.36747 4.51025C7.57735 4.25194 7.78881 4.00927 7.99999 3.78356C8.21117 4.00927 8.42263 4.25194 8.63251 4.51025C8.42369 4.50346 8.21274 4.5 8 4.5C7.78725 4.5 7.5763 4.50345 7.36747 4.51025ZM8.71425 3.08331C9.13781 3.53447 9.55759 4.04358 9.96246 4.60092C10.6475 4.67288 11.2983 4.78186 11.9008 4.92309C11.9383 4.74244 11.9693 4.56671 11.9939 4.39657C12.0927 3.71031 12.0817 3.14114 11.9802 2.71499C11.879 2.29025 11.7013 2.05404 11.5 1.93782C11.2987 1.82161 11.0053 1.7858 10.5868 1.91053C10.167 2.03568 9.66859 2.31073 9.12371 2.73948C8.98862 2.84578 8.85196 2.96052 8.71425 3.08331ZM8 5.5C8.48433 5.5 8.95638 5.51885 9.41188 5.55456C9.67056 5.93118 9.9229 6.33056 10.1651 6.75C10.4072 7.16944 10.6269 7.58766 10.8237 7.99998C10.6269 8.41232 10.4072 8.83055 10.165 9.25C9.92288 9.66944 9.67053 10.0688 9.41185 10.4454C8.95636 10.4812 8.48432 10.5 8 10.5C7.51567 10.5 7.04363 10.4812 6.58813 10.4454C6.32945 10.0688 6.0771 9.66944 5.83494 9.25C5.59277 8.83055 5.37306 8.41232 5.17624 7.99998C5.37306 7.58765 5.59275 7.16944 5.83492 6.75C6.07708 6.33056 6.32942 5.93118 6.5881 5.55456C7.04361 5.51884 7.51566 5.5 8 5.5ZM11.0311 6.25C11.1375 6.43423 11.2399 6.61864 11.3385 6.80287C11.4572 6.49197 11.5616 6.18752 11.6515 5.89178C11.3505 5.82175 11.0346 5.75996 10.706 5.70736C10.8163 5.8848 10.9247 6.06576 11.0311 6.25ZM11.0311 9.75C11.1374 9.56576 11.2399 9.38133 11.3385 9.19709C11.4572 9.50801 11.5617 9.81246 11.6515 10.1082C11.3505 10.1782 11.0346 10.24 10.7059 10.2926C10.8162 10.1152 10.9247 9.93424 11.0311 9.75ZM11.9249 7.99998C12.2051 8.62927 12.4362 9.24738 12.6151 9.83977C12.7903 9.78191 12.958 9.72092 13.1176 9.65708C13.7614 9.39958 14.2488 9.10547 14.5671 8.80446C14.8843 8.50445 15 8.23243 15 8C15 7.76757 14.8843 7.49555 14.5671 7.19554C14.2488 6.89453 13.7614 6.60042 13.1176 6.34292C12.958 6.27907 12.7903 6.21808 12.6151 6.16022C12.4362 6.7526 12.2051 7.37069 11.9249 7.99998ZM9.96244 11.3991C10.6475 11.3271 11.2983 11.2181 11.9008 11.0769C11.9383 11.2576 11.9694 11.4333 11.9939 11.6034C12.0928 12.2897 12.0817 12.8589 11.9802 13.285C11.879 13.7098 11.7013 13.946 11.5 14.0622C11.2987 14.1784 11.0053 14.2142 10.5868 14.0895C10.167 13.9643 9.66861 13.6893 9.12373 13.2605C8.98863 13.1542 8.85196 13.0395 8.71424 12.9167C9.1378 12.4655 9.55758 11.9564 9.96244 11.3991ZM8.63249 11.4898C8.42262 11.7481 8.21116 11.9907 7.99999 12.2164C7.78881 11.9907 7.57737 11.7481 7.36749 11.4897C7.57631 11.4965 7.78726 11.5 8 11.5C8.21273 11.5 8.42367 11.4965 8.63249 11.4898ZM4.96891 9.75C5.07528 9.93424 5.18375 10.1152 5.29404 10.2926C4.9654 10.24 4.64951 10.1782 4.34844 10.1082C4.43833 9.81246 4.54276 9.508 4.66152 9.19708C4.76005 9.38133 4.86254 9.56575 4.96891 9.75ZM6.03754 11.3991C5.35244 11.3271 4.70163 11.2181 4.09914 11.0769C4.06165 11.2576 4.03062 11.4333 4.0061 11.6034C3.90723 12.2897 3.91823 12.8589 4.01977 13.285C4.12097 13.7098 4.29869 13.946 4.49998 14.0622C4.70127 14.1784 4.9947 14.2142 5.41313 14.0895C5.83296 13.9643 6.33137 13.6893 6.87625 13.2605C7.01135 13.1542 7.14802 13.0395 7.28573 12.9167C6.86217 12.4655 6.4424 11.9564 6.03754 11.3991ZM4.07507 7.99998C3.79484 8.62927 3.56381 9.24737 3.38489 9.83977C3.20969 9.78191 3.042 9.72092 2.88239 9.65708C2.23864 9.39958 1.75123 9.10547 1.43294 8.80446C1.11571 8.50445 1 8.23243 1 8C1 7.76757 1.11571 7.49555 1.43294 7.19554C1.75123 6.89453 2.23864 6.60042 2.88239 6.34292C3.042 6.27907 3.2097 6.21808 3.3849 6.16022C3.56383 6.75261 3.79484 7.37069 4.07507 7.99998ZM4.66152 6.80287C4.54277 6.49197 4.43835 6.18752 4.34846 5.89178C4.64952 5.82175 4.96539 5.75996 5.29402 5.70736C5.18373 5.8848 5.07526 6.06576 4.96889 6.25C4.86253 6.43423 4.76005 6.61864 4.66152 6.80287ZM9.25 8C9.25 8.69036 8.69036 9.25 8 9.25C7.30964 9.25 6.75 8.69036 6.75 8C6.75 7.30965 7.30964 6.75 8 6.75C8.69036 6.75 9.25 7.30965 9.25 8Z" fill="#149ECA"></path>
-                        <defs>
-                          <rect width="64" height="64" fill="white"></rect>
-                        </defs></svg>
-                    </div>
-
-                    {/* Next.js */}
-                    <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="Next.js">
-                      <div className="text-6xl font-light tracking-tight">
-                        <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><g clipPath="url(#clip0_53_108)">
-                          <circle cx="8" cy="8" r="7.375" fill="black" stroke="var(--ds-gray-1000)" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"></circle>
-                          <path d="M10.63 11V5" stroke="url(#paint0_linear_53_108_r_1o_)" strokeWidth="1.25" strokeMiterlimit="1.41421"></path>
-                          <path fillRule="evenodd" clipRule="evenodd" d="M5.995 5.00087V5H4.745V11H5.995V6.96798L12.3615 14.7076C12.712 14.4793 13.0434 14.2242 13.353 13.9453L5.99527 5.00065L5.995 5.00087Z" fill="url(#paint1_linear_53_108_r_1o_)"></path>
-                        </g>
-                          <defs>
-                            <linearGradient id="paint0_linear_53_108_r_1o_" x1="11.13" y1="5" x2="11.13" y2="11" gradientUnits="userSpaceOnUse">
-                              <stop stopColor="white"></stop>
-                              <stop offset="0.609375" stopColor="white" stopOpacity="0.57"></stop>
-                              <stop offset="0.796875" stopColor="white" stopOpacity="0"></stop>
-                              <stop offset="1" stopColor="white" stopOpacity="0"></stop>
-                            </linearGradient>
-                            <linearGradient id="paint1_linear_53_108_r_1o_" x1="9.9375" y1="9.0625" x2="13.5574" y2="13.3992" gradientUnits="userSpaceOnUse">
-                              <stop stopColor="white"></stop>
-                              <stop offset="1" stopColor="white" stopOpacity="0"></stop>
-                            </linearGradient>
-                            <clipPath id="clip0_53_108">
-                              <rect width="16" height="16" fill="red"></rect>
-                            </clipPath>
-                          </defs></svg>
-                      </div>
-                    </div>
-
-                    {/* MongoDB */}
-                    <div className="aspect-square flex items-center justify-center border-r border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="MongoDB">
-                      <svg className="w-32 h-32" viewBox="0 -183 512 512" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fillRule="evenodd"> <path d="M476.713 60.463c-.46.092-.922 1.107-.922 1.66-.092 3.692-.184 13.474-.184 20.118 0 .185.276.554.553.554 1.384.092 4.706.184 7.567.184 3.968 0 6.275-.553 7.568-1.106 3.321-1.662 4.89-5.261 4.89-9.23 0-8.95-6.275-12.365-15.596-12.365-.646-.092-2.49-.092-3.876.185zm23.81 41.25c0-9.136-6.737-14.212-18.918-14.212-.554 0-4.43-.092-5.353.092-.277.093-.645.278-.645.555 0 6.551-.093 16.98.184 21.04.184 1.753 1.477 4.245 3.046 4.983 1.66.923 5.444 1.107 8.028 1.107 7.29 0 13.658-4.06 13.658-13.565zm-42.634-46.325c.922 0 3.69.276 10.796.276 6.737 0 12.089-.184 18.641-.184 8.028 0 19.102 2.86 19.102 14.857 0 5.906-4.153 10.613-9.597 12.92-.276.092-.276.276 0 .368 7.751 1.939 14.581 6.737 14.581 15.78 0 8.86-5.537 14.489-13.566 17.996-4.891 2.122-10.981 2.86-17.164 2.86-4.707 0-17.349-.553-24.362-.368-.738-.278.646-3.6 1.291-4.153 1.662-.093 2.953-.185 4.707-.739 2.492-.645 2.768-1.384 3.137-5.167.185-3.23.185-14.674.185-22.794 0-11.166.093-18.733 0-22.424-.092-2.86-1.107-3.784-3.137-4.338-1.57-.276-4.153-.646-6.276-.922-.462-.462 1.107-3.6 1.662-3.968zm-53.248 57.399c2.216 1.752 6.553 2.49 10.429 2.49 4.983 0 9.966-.921 14.765-5.26 4.891-4.428 8.305-11.257 8.305-22.146 0-10.429-3.968-18.919-12.089-23.901-4.614-2.862-10.52-4.06-17.349-4.06-2.03 0-3.968.092-5.167.645-.278.185-.923 1.015-.923 1.476-.185 1.846-.185 16.057-.185 24.363 0 8.582 0 20.579.185 21.963 0 1.385.645 3.507 2.03 4.43zm-20.948-57.4c1.754 0 8.49.277 11.72.277 5.815 0 9.967-.276 20.948-.276 9.228 0 16.98 2.491 22.517 7.197 6.736 5.814 10.244 13.843 10.244 23.624 0 13.935-6.368 21.964-12.736 26.578-6.366 4.706-14.672 7.474-26.484 7.474-6.275 0-17.072-.184-26.024-.277h-.092c-.461-.83.738-4.06 1.476-4.152 2.4-.277 3.046-.37 4.246-.83 1.937-.739 2.307-1.754 2.584-5.168.276-6.368.184-14.027.184-22.702 0-6.182.092-18.272-.093-22.148-.276-3.229-1.66-4.06-4.429-4.614-1.384-.276-3.23-.646-5.813-.922-.37-.647 1.291-3.507 1.752-4.06z" fill="#8E714E"></path> <path d="M272.033 116.385c-2.307-.277-3.968-.645-5.998-1.568-.277-.185-.739-1.107-.739-1.477-.184-3.23-.184-12.458-.184-18.64 0-4.984-.83-9.321-2.953-12.366-2.492-3.508-6.09-5.537-10.705-5.537-4.06 0-9.505 2.768-14.027 6.644-.092.092-.83.739-.738-.277 0-1.015.185-3.045.277-4.43.093-1.292-.646-1.937-.646-1.937-2.953 1.476-11.258 3.414-14.304 3.69-2.214.463-2.768 2.585-.46 3.323h.092c2.49.738 4.152 1.569 5.443 2.4.923.738.831 1.753.831 2.584.092 6.92.092 17.533-.184 23.347-.092 2.307-.738 3.137-2.4 3.506l.185-.092c-1.292.277-2.307.553-3.876.738-.554.554-.554 3.507 0 4.153 1.015 0 6.367-.277 10.798-.277 6.09 0 9.228.277 10.796.277.646-.738.831-3.507.462-4.153-1.754-.092-3.046-.276-4.245-.646-1.661-.37-2.123-1.199-2.216-3.137-.183-4.892-.183-15.227-.183-22.24 0-1.938.553-2.861 1.106-3.415 2.123-1.845 5.538-3.137 8.583-3.137 2.953 0 4.89.923 6.367 2.123 2.03 1.66 2.676 4.06 2.953 5.813.461 3.968.277 11.812.277 18.641 0 3.691-.277 4.614-1.66 5.075-.647.277-2.308.647-4.246.83-.646.647-.461 3.508 0 4.154 2.676 0 5.814-.277 10.428-.277 5.721 0 9.413.277 10.89.277.46-.554.645-3.23.276-3.969zm25.562-35.25c-4.89 0-7.936 3.783-7.936 9.688 0 5.999 2.676 12.92 10.243 12.92 1.292 0 3.692-.554 4.798-1.846 1.754-1.66 2.954-4.983 2.954-8.49 0-7.659-3.784-12.273-10.059-12.273zm-.646 40.787c-1.845 0-3.138.554-3.968 1.016-3.876 2.49-5.629 4.89-5.629 7.752 0 2.675 1.015 4.797 3.23 6.643 2.676 2.307 6.367 3.415 11.073 3.415 9.413 0 13.566-5.076 13.566-10.058 0-3.508-1.754-5.815-5.352-7.106-2.584-1.108-7.29-1.662-12.92-1.662zm.646 23.994c-5.629 0-9.69-1.2-13.196-3.876-3.415-2.584-4.891-6.46-4.891-9.136 0-.738.185-2.769 1.846-4.614 1.014-1.108 3.23-3.23 8.49-6.829.184-.092.276-.184.276-.37 0-.184-.185-.369-.369-.46-4.337-1.661-5.629-4.338-5.999-5.814v-.185c-.091-.554-.276-1.107.555-1.661.646-.461 1.569-1.015 2.583-1.66 1.569-.924 3.23-1.939 4.245-2.77.185-.184.185-.368.185-.553 0-.185-.185-.37-.37-.461-6.458-2.123-9.688-6.922-9.688-14.12 0-4.706 2.122-8.951 5.905-11.627 2.584-2.03 9.044-4.522 13.289-4.522h.277c4.337.092 6.736 1.015 10.15 2.215 1.846.646 3.6.922 6 .922 3.598 0 5.167-1.107 6.458-2.398.093.184.278.646.37 1.845.092 1.2-.277 2.953-1.2 4.245-.738 1.015-2.399 1.754-4.06 1.754h-.462c-1.661-.185-2.4-.37-2.4-.37l-.368.185c-.092.185 0 .369.092.646l.093.185c.184.83.553 3.321.553 3.968 0 7.567-3.045 10.888-6.275 13.38-3.138 2.307-6.736 3.783-10.797 4.153-.092 0-.46 0-1.292.092-.461 0-1.107.093-1.2.093h-.092c-.738.184-2.583 1.107-2.583 2.675 0 1.384.83 3.046 4.798 3.323.83.092 1.66.092 2.584.185 5.26.368 11.812.83 14.857 1.845 4.245 1.568 6.921 5.352 6.921 9.874 0 6.83-4.89 13.197-13.011 17.164-3.968 1.754-7.937 2.677-12.274 2.677zm52.6-64.32c-1.937 0-3.691.46-4.983 1.383-3.598 2.215-5.444 6.645-5.444 13.104 0 12.09 6.09 20.58 14.765 20.58 2.584 0 4.614-.739 6.367-2.215 2.676-2.216 4.061-6.645 4.061-12.828 0-11.996-5.999-20.025-14.765-20.025zm1.662 39.496c-15.688 0-21.317-11.535-21.317-22.332 0-7.567 3.045-13.381 9.135-17.534 4.338-2.676 9.506-4.152 14.12-4.152 11.996 0 20.394 8.582 20.394 20.948 0 8.397-3.322 15.041-9.69 19.102-3.045 2.03-8.305 3.968-12.643 3.968h.001zM187.411 81.595c-1.938 0-3.691.461-4.984 1.384-3.598 2.215-5.444 6.645-5.444 13.104 0 12.09 6.09 20.58 14.765 20.58 2.584 0 4.614-.739 6.368-2.215 2.675-2.216 4.06-6.645 4.06-12.828 0-11.996-5.906-20.025-14.765-20.025zm1.661 39.497c-15.688 0-21.317-11.535-21.317-22.332 0-7.567 3.045-13.381 9.135-17.534 4.338-2.676 9.506-4.152 14.12-4.152 11.997 0 20.394 8.582 20.394 20.948 0 8.397-3.322 15.041-9.69 19.102-2.953 2.03-8.213 3.968-12.642 3.968zm-105.478-.923c-.185-.276-.37-1.107-.277-2.122 0-.739.185-1.2.277-1.384 1.938-.278 2.953-.555 4.06-.831 1.846-.462 2.584-1.476 2.676-3.783.278-5.537.278-16.058.185-23.348v-.185c0-.83 0-1.846-1.015-2.584-1.477-.922-3.23-1.752-5.537-2.4-.83-.275-1.384-.737-1.292-1.29 0-.554.554-1.2 1.754-1.385 3.045-.277 10.98-2.214 14.118-3.599.185.184.462.739.462 1.477l-.092 1.014c-.093 1.016-.185 2.216-.185 3.415 0 .369.37.646.738.646.185 0 .37-.092.554-.185 5.906-4.614 11.258-6.275 14.026-6.275 4.523 0 8.03 2.123 10.706 6.552.184.278.369.37.646.37.184 0 .46-.092.553-.277 5.445-4.153 10.89-6.645 14.488-6.645 8.582 0 13.658 6.368 13.658 17.165 0 3.045 0 7.013-.092 10.613 0 3.229-.092 6.182-.092 8.305 0 .46.645 1.937 1.66 2.214 1.292.646 3.046.923 5.353 1.292h.092c.185.646-.184 3.045-.553 3.507-.554 0-1.385 0-2.307-.092a136.208 136.208 0 0 0-7.014-.185c-5.721 0-8.674.092-11.536.277-.183-.738-.276-2.953 0-3.507 1.662-.276 2.492-.554 3.508-.83 1.846-.554 2.307-1.385 2.4-3.784 0-1.753.368-16.703-.186-20.302-.553-3.691-3.322-8.028-9.413-8.028-2.307 0-5.905.923-9.412 3.598-.184.185-.37.646-.37.923v.093c.37 1.937.37 4.153.37 7.567v5.998c0 4.153-.093 8.029 0 10.981 0 2.031 1.2 2.492 2.215 2.862.554.091.922.184 1.384.276.83.185 1.661.37 2.953.646.185.37.185 1.569-.092 2.584-.093.554-.278.83-.37.923-3.137-.092-6.367-.185-11.073-.185-1.384 0-3.784.093-5.814.093-1.662 0-3.23.092-4.152.092-.093-.185-.278-.83-.278-1.846 0-.83.185-1.476.37-1.661.461-.092.83-.184 1.292-.184 1.106-.185 2.03-.37 2.952-.554 1.57-.461 2.123-1.292 2.215-3.322.277-4.614.554-17.81-.092-21.133-1.107-5.352-4.152-8.028-9.044-8.028-2.86 0-6.46 1.384-9.412 3.6-.462.368-.831 1.29-.831 2.121v5.445c0 6.644 0 14.95.092 18.549.093 1.106.461 2.399 2.584 2.86.462.092 1.2.277 2.123.37l1.66.276c.186.554.093 2.769-.276 3.507-.923 0-2.03-.092-3.323-.092-1.937-.093-4.429-.185-7.197-.185-3.23 0-5.537.092-7.383.185-1.292-.185-2.307-.185-3.414-.185z" fill="#442D22"></path> <path d="M35.053 142.317l-3.783-1.293s.462-19.286-6.46-20.67c-4.613-5.353.74-227.013 17.35-.739 0 0-5.722 2.86-6.737 7.752-1.108 4.799-.37 14.95-.37 14.95z" fill="#FFF"></path> <path d="M35.053 142.317l-3.783-1.293s.462-19.286-6.46-20.67c-4.613-5.353.74-227.013 17.35-.739 0 0-5.722 2.86-6.737 7.752-1.108 4.799-.37 14.95-.37 14.95z" fill="#A6A385"></path> <path d="M37.084 123.676s33.13-21.779 25.377-67.09c-7.474-32.943-25.1-43.74-27.038-47.893C33.301 5.74 31.27.573 31.27.573l1.385 91.634c0 .093-2.861 28.054 4.43 31.47" fill="#FFF"></path> <path d="M37.084 123.676s33.13-21.779 25.377-67.09c-7.474-32.943-25.1-43.74-27.038-47.893C33.301 5.74 31.27.573 31.27.573l1.385 91.634c0 .093-2.861 28.054 4.43 31.47" fill="#499D4A"></path> <path d="M29.333 124.875S-1.767 103.65.079 66.277C1.832 28.903 23.795 10.539 28.04 7.217c2.769-2.953 2.861-4.061 3.046-7.014 1.938 4.153 1.569 62.106 1.845 68.934.83 26.3-1.476 50.756-3.598 55.738z" fill="#FFF"></path> <path d="M29.333 124.875S-1.767 103.65.079 66.277C1.832 28.903 23.795 10.539 28.04 7.217c2.769-2.953 2.861-4.061 3.046-7.014 1.938 4.153 1.569 62.106 1.845 68.934.83 26.3-1.476 50.756-3.598 55.738z" fill="#58AA50"></path> </g> </g></svg>
-                    </div>
-
-                    {/* Figma */}
-                    <div className="aspect-square flex items-center justify-center border-b border-border hover:bg-accent transition-colors p-8" data-cursor-text="Figma">
-                      <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><path d="M8.00342 8C8.00342 7.29275 8.28437 6.61448 8.78447 6.11438C9.28456 5.61428 9.96284 5.33333 10.6701 5.33333C11.3773 5.33333 12.0556 5.61428 12.5557 6.11438C13.0558 6.61448 13.3368 7.29275 13.3368 8C13.3368 8.70724 13.0558 9.38552 12.5557 9.88562C12.0556 10.3857 11.3773 10.6667 10.6701 10.6667C9.96284 10.6667 9.28456 10.3857 8.78447 9.88562C8.28437 9.38552 8.00342 8.70724 8.00342 8Z" fill="#1ABCFE"></path>
-                        <path d="M2.66992 13.3333C2.66992 12.6261 2.95087 11.9478 3.45097 11.4477C3.95107 10.9476 4.62934 10.6667 5.33659 10.6667H8.00326V13.3333C8.00326 14.0406 7.7223 14.7189 7.22221 15.2189C6.72211 15.719 6.04383 16 5.33659 16C4.62934 16 3.95107 15.719 3.45097 15.2189C2.95087 14.7189 2.66992 14.0406 2.66992 13.3333Z" fill="#0ACF83"></path>
-                        <path d="M8.00342 0V5.33333H10.6701C11.3773 5.33333 12.0556 5.05238 12.5557 4.55228C13.0558 4.05219 13.3368 3.37391 13.3368 2.66667C13.3368 1.95942 13.0558 1.28115 12.5557 0.781049C12.0556 0.280952 11.3773 0 10.6701 0L8.00342 0Z" fill="#FF7262"></path>
-                        <path d="M2.67017 2.66667C2.67017 3.37391 2.95112 4.05219 3.45121 4.55228C3.95131 5.05238 4.62959 5.33333 5.33683 5.33333H8.0035V0H5.33683C4.62959 0 3.95131 0.280952 3.45121 0.781049C2.95112 1.28115 2.67017 1.95942 2.67017 2.66667Z" fill="#F24E1E"></path>
-                        <path d="M2.66992 8C2.66992 8.70724 2.95087 9.38552 3.45097 9.88562C3.95107 10.3857 4.62934 10.6667 5.33659 10.6667H8.00326V5.33333H5.33659C4.62934 5.33333 3.95107 5.61428 3.45097 6.11438C2.95087 6.61448 2.66992 7.29275 2.66992 8Z" fill="#A259FF"></path></svg>
-                    </div>
-
-                    {/* Vercel */}
-                    <div className="aspect-square flex items-center justify-center border-r border-border hover:bg-accent transition-colors p-8" data-cursor-text="Vercel">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 2L2 22h20L12 2z" />
-                        </svg>
-                        <span className="text-2xl font-semibold">Vercel</span>
-                      </div>
-                    </div>
-
-                    {/* TypeScript */}
-                    <div className="aspect-square flex items-center justify-center border-r border-border hover:bg-accent transition-colors p-8" data-cursor-text="TypeScript">
-                      <div className="text-6xl font-bold text-sky-600">TS</div>
-                    </div>
-
-                    {/* Tailwind */}
-                    <div className="aspect-square flex items-center justify-center hover:bg-accent transition-colors p-8" data-cursor-text="Tailwind">
-                      <svg className="w-24 h-24" viewBox="0 0 24 24" fill="oklch(71.5% 0.143 215.221)">
-                        <path d="M12 6C9.33 6 7.67 7.33 7 10C8 8.67 9.17 8.17 10.5 8.5C11.26 8.67 11.81 9.23 12.41 9.84C13.39 10.84 14.54 12 17 12C19.67 12 21.33 10.67 22 8C21 9.33 19.83 9.83 18.5 9.5C17.74 9.33 17.19 8.77 16.59 8.16C15.61 7.16 14.46 6 12 6M7 12C4.33 12 2.67 13.33 2 16C3 14.67 4.17 14.17 5.5 14.5C6.26 14.67 6.81 15.23 7.41 15.84C8.39 16.84 9.54 18 12 18C14.67 18 16.33 16.67 17 14C16 15.33 14.83 15.83 13.5 15.5C12.74 15.33 12.19 14.77 11.59 14.16C10.61 13.16 9.46 12 7 12Z" />
-                      </svg>
-                    </div>
-                    {/* Nodejs */}
-                    <div className="aspect-square flex items-center justify-center hover:bg-accent transition-colors p-8 border-r border-l" data-cursor-text="Node.js">
-                      <svg data-testid="geist-icon" height="64" strokeLinejoin="round" viewBox="0 0 16 16" width="64"><mask id="mask0_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                        <path d="M7.62322 0.101215L1.37744 3.72072C1.1435 3.85617 1 4.10623 1 4.37653V11.6206C1 11.8911 1.1435 12.141 1.37744 12.2764L7.62367 15.8987C7.85716 16.0338 8.14506 16.0338 8.37826 15.8987L14.6234 12.2764C14.8562 12.141 15 11.8909 15 11.6206V4.37653C15 4.10623 14.8562 3.85617 14.622 3.72072L8.37767 0.101215C8.26055 0.0337871 8.13009 0 7.99963 0C7.86917 0 7.73871 0.0337871 7.62159 0.101215" fill="white"></path>
-                      </mask>
-                        <g mask="url(#mask0_872_3158)">
-                          <path d="M21.3115 3.10613L3.71197 -5.55525L-5.31201 12.9276L12.2871 21.5894L21.3115 3.10613Z" fill="url(#paint0_linear_872_3158)"></path>
-                        </g>
-                        <mask id="mask1_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                          <path d="M1.15454 12.0805C1.21429 12.1584 1.289 12.2258 1.37692 12.2764L6.73468 15.3836L7.62714 15.8986C7.76057 15.976 7.91267 16.0087 8.06211 15.9976C8.11192 15.9936 8.16173 15.9842 8.21036 15.9703L14.7977 3.86019C14.7473 3.80511 14.6883 3.75897 14.6222 3.72027L10.5325 1.34915L8.37077 0.100323C8.30939 0.0646001 8.24282 0.0392964 8.17507 0.0214348L1.15454 12.0805Z" fill="white"></path>
-                        </mask>
-                        <g mask="url(#mask1_872_3158)">
-                          <path d="M-6.45459 5.66793L5.97248 22.555L22.4075 10.3636L9.97968 -6.52305L-6.45459 5.66793Z" fill="url(#paint1_linear_872_3158)"></path>
-                        </g>
-                        <mask id="mask2_872_3158" maskUnits="userSpaceOnUse" x="1" y="0" width="14" height="16">
-                          <path d="M7.92494 0.00417044C7.82013 0.0145897 7.71769 0.0473349 7.62325 0.101217L1.39526 3.7103L8.11099 15.9916C8.20439 15.9782 8.29631 15.947 8.37933 15.8988L14.6251 12.2764C14.8178 12.1642 14.9498 11.9743 14.9898 11.759L8.14361 0.0165236C8.0932 0.00655088 8.0428 0.00134277 7.99091 0.00134277C7.97016 0.00134277 7.9494 0.00238306 7.92865 0.00431807" fill="white"></path>
-                        </mask>
-                        <g mask="url(#mask2_872_3158)">
-                          <path d="M1.39502 0.00134277V15.9919H14.987V0.00134277H1.39502Z" fill="url(#paint2_linear_872_3158)"></path>
-                        </g>
-                        <defs>
-                          <linearGradient id="paint0_linear_872_3158" x1="12.5064" y1="-1.23818" x2="3.42452" y2="17.2146" gradientUnits="userSpaceOnUse">
-                            <stop offset="0.3" stopColor="#3E863D"></stop>
-                            <stop offset="0.5" stopColor="#55934F"></stop>
-                            <stop offset="0.8" stopColor="#5AAD45"></stop>
-                          </linearGradient>
-                          <linearGradient id="paint1_linear_872_3158" x1="-0.166585" y1="14.2083" x2="16.3156" y2="2.07868" gradientUnits="userSpaceOnUse">
-                            <stop offset="0.57" stopColor="#3E863D"></stop>
-                            <stop offset="0.72" stopColor="#619857"></stop>
-                            <stop offset="1" stopColor="#76AC64"></stop>
-                          </linearGradient>
-                          <linearGradient id="paint2_linear_872_3158" x1="1.39961" y1="7.99708" x2="14.9896" y2="7.99708" gradientUnits="userSpaceOnUse">
-                            <stop offset="0.16" stopColor="#6BBF47"></stop>
-                            <stop offset="0.38" stopColor="#79B461"></stop>
-                            <stop offset="0.47" stopColor="#75AC64"></stop>
-                            <stop offset="0.7" stopColor="#659E5A"></stop>
-                            <stop offset="0.9" stopColor="#3E863D"></stop>
-                          </linearGradient>
-                        </defs></svg>
-                    </div>
-                  </div>
-                </CursorFollow>
-              </section>
-              <section className="flex items-center justify-center mt-12">
-                <h4 className="mx-8 text-8xl font-bold">
-                  <Link href="mailto:tarunmonga2208@gmail.com" data-cursor-text="Have Some Questions?">Get in touch<ArrowUpRight className="inline" /></Link><span className="text-[#043360] italic">. Let's talk</span>
-                </h4>
-              </section>
-            </ClickSpark>
+              </RevealItem>
+              <RevealItem>
+                <p>
+                  Outside of code I{" "}
+                  <span className="font-semibold italic text-[#043360]">swim</span> to clear my head,
+                  and I try to read. Sometimes it works. Sometimes I just buy more{" "}
+                  <Link href="/library" className="link-underline font-semibold italic text-[#043360]">
+                    books
+                  </Link>
+                  . Growth is a process.
+                </p>
+              </RevealItem>
+            </RevealGroup>
           </div>
-        </div>
-      }
-    </div>
+        </section>
+
+        {/* 02 — Work */}
+        <section id="work" className="scroll-mt-24 px-6 md:px-10">
+          <SectionHeading index="02 / Selected Work">Work</SectionHeading>
+          <div className="mt-8">
+            {WORK.map((entry, i) => (
+              <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
+            ))}
+          </div>
+        </section>
+
+        {/* 03 — Projects */}
+        <section className="px-6 pt-24 md:px-10 md:pt-32">
+          <SectionHeading index="03 / Things I Built">Projects</SectionHeading>
+          <div className="mt-8">
+            {PROJECTS.map((entry, i) => (
+              <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
+            ))}
+          </div>
+        </section>
+
+        {/* 04 — Stack */}
+        <section id="stack" className="scroll-mt-24 px-6 py-24 md:px-10 md:py-32">
+          <SectionHeading index="04 / Tools of the Trade">Stack</SectionHeading>
+          <div className="mt-14 flex flex-col gap-16">
+            <Reveal>
+              <TechStack />
+            </Reveal>
+            <div>
+              <p className="mb-6 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                Also familiar with
+              </p>
+              <Reveal>
+                <Tools />
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* 05 — Beyond the code */}
+        <section className="px-6 pb-24 md:px-10 md:pb-32">
+          <SectionHeading index="05 / Beyond the Code">Travel</SectionHeading>
+          <Reveal>
+            <p className="mt-14 max-w-2xl text-2xl leading-snug text-muted-foreground">
+              Some places I&apos;ve been. Open a folder.
+            </p>
+          </Reveal>
+          <RevealGroup className="mt-10 flex flex-wrap gap-8">
+            {blogData.map((blog) => (
+              <RevealItem key={blog.id}>
+                <IOSFolder blog={blog} />
+              </RevealItem>
+            ))}
+          </RevealGroup>
+        </section>
+
+        {/* 06 — Contact */}
+        <section id="contact" className="scroll-mt-24 border-t border-border px-6 py-24 md:px-10 md:py-32">
+          <Reveal>
+            <p className="mb-10 text-xs uppercase tracking-[0.25em] text-muted-foreground">
+              06 / Contact
+            </p>
+          </Reveal>
+          <Reveal>
+            <Magnetic strength={0.15}>
+              <h2 className="text-6xl font-bold leading-[0.95] md:text-8xl">
+                <Link
+                  href="mailto:tarunmonga2208@gmail.com"
+                  data-cursor-text="Say hello"
+                  className="group inline-flex items-baseline transition-colors hover:text-[#043360]"
+                >
+                  <span className="link-underline">Get in touch</span>
+                  <ArrowUpRight className="inline size-12 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:-translate-y-2 md:size-20" />
+                </Link>
+                <span className="italic text-[#043360]">. Let&apos;s talk.</span>
+              </h2>
+            </Magnetic>
+          </Reveal>
+        </section>
+
+        <footer className="flex flex-col gap-4 border-t border-border px-6 py-10 text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row md:items-center md:justify-between md:px-10">
+          <span>© {new Date().getFullYear()} Tarun Monga</span>
+          <span>Built with Next.js &amp; Three.js</span>
+        </footer>
+      </main>
+    </ClickSpark>
   );
 }

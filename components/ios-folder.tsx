@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
 import Image from "next/image"
@@ -13,6 +14,29 @@ interface IOSFolderProps {
 
 export function IOSFolder({ blog }: IOSFolderProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => setMounted(true), [])
+
+    // Lock the page behind the overlay while it is open.
+    useEffect(() => {
+        if (!isOpen) return
+        const previous = document.body.style.overflow
+        document.body.style.overflow = "hidden"
+        return () => {
+            document.body.style.overflow = previous
+        }
+    }, [isOpen])
+
+    // Close on Escape.
+    useEffect(() => {
+        if (!isOpen) return
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsOpen(false)
+        }
+        window.addEventListener("keydown", onKey)
+        return () => window.removeEventListener("keydown", onKey)
+    }, [isOpen])
 
     return (
         <div className="flex flex-col items-center gap-2">
@@ -36,14 +60,22 @@ export function IOSFolder({ blog }: IOSFolderProps) {
             </motion.div>
             <span className="text-[13px] font-medium text-black drop-shadow-sm select-none">{blog.title}</span>
 
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
-                    >
+            {/*
+              * Portalled to <body> on purpose. This overlay is `position: fixed`, and any
+              * ancestor with a transform, filter, or will-change becomes its containing
+              * block — which silently re-anchors it to that ancestor's box instead of the
+              * viewport. The folders sit inside animated wrappers, so that kept happening.
+              * Escaping the tree makes it immune to whatever the page does above it.
+              */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+                        >
                         {/* Backdrop Blur */}
                         <motion.div
                             initial={{ backdropFilter: "blur(0px)" }}
@@ -108,9 +140,11 @@ export function IOSFolder({ blog }: IOSFolderProps) {
                                 </div>
                             </ScrollArea>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     )
 }

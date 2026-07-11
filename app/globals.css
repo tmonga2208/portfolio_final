@@ -49,6 +49,8 @@
 
 :root {
   --radius: 0.625rem;
+  /* Consumed by the CursorFollow label bubble, which otherwise falls back to indigo. */
+  --color-brand: #043360;
   --background: #FAF9F6;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -139,13 +141,22 @@
   }
 }
 
-* {
+/*
+ * Only hide the native cursor where a replacement is actually rendered. Applying this
+ * globally left the homepage with no cursor at all outside <CursorFollow>.
+ */
+.hide-cursor,
+.hide-cursor * {
   cursor: none;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 ::selection {
-  background: black;
-  color: white;
+  background: #043360;
+  color: #faf9f6;
 }
 
 @keyframes music-pulse {
@@ -160,4 +171,84 @@
 }
 .animate-music-pulse {
     animation: music-pulse 1s ease-in-out infinite;
+}
+
+/* Underline that draws in from the left on hover. */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1.5px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Image frames: the frame lifts, the image inside pushes in slightly. */
+.media-frame {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s ease;
+}
+.media-frame:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in oklab, #043360 35%, transparent);
+  box-shadow: 0 18px 40px -22px rgb(4 51 96 / 0.45);
+}
+.media-frame img {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.media-frame:hover img {
+  transform: scale(1.06);
+}
+
+/* Work / project rows. */
+.entry-row {
+  transition: border-color 0.5s ease;
+}
+.entry-row:hover {
+  border-color: color-mix(in oklab, #043360 30%, transparent);
+}
+.entry-row .entry-icon {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s ease;
+}
+.entry-row:hover .entry-icon {
+  transform: rotate(-45deg) scale(1.1);
+  color: #043360;
+}
+
+/* Tech grid cells. */
+.tech-cell svg,
+.tech-cell img,
+.tech-cell .tech-label {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tech-cell:hover svg,
+.tech-cell:hover img,
+.tech-cell:hover .tech-label {
+  transform: scale(1.12) translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
