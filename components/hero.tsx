@@ -30,19 +30,23 @@ const letter: Variants = {
  *
  * `x`/`y` place the centre of each frame in the band, `h` is its height as a
  * fraction of the band (sizing by height is what makes them fill it; the width
- * follows from the aspect ratio). Phones get their own coordinates — `m` — because
- * the desktop spread would run off the edges.
+ * follows from the aspect ratio).
+ *
+ * Phones get their own coordinates — `m` — and a different idea: the big photo holds
+ * the middle while the four uprights run off the left and right edges, cropped by the
+ * section. Bleeding them is what buys the size; contained inside 390px they could
+ * only ever be stamps. The centre stays fully in frame.
  *
  * `depth` is how far back a photo sits, and it drives three things at once: it damps
  * the parallax, softens the shadow, and drops the photo behind the ones in front.
  * That is what gives the cluster its layering.
  */
 const PHOTOS = [
-  { src: "/img1.JPG", aspect: "aspect-3/4", depth: 0.9, d: { x: "15%", y: "30%", h: "56%" }, m: { x: "17%", y: "20%", h: "36%" } },
-  { src: "/img2.jpg", aspect: "aspect-4/5", depth: 0.6, d: { x: "24%", y: "73%", h: "51%" }, m: { x: "19%", y: "82%", h: "34%" } },
-  { src: "/img5.jpeg", aspect: "aspect-4/5", depth: 0, d: { x: "50%", y: "50%", h: "100%" }, m: { x: "50%", y: "50%", h: "66%" } },
-  { src: "/img3.JPG", aspect: "aspect-4/5", depth: 0.8, d: { x: "85%", y: "27%", h: "53%" }, m: { x: "83%", y: "22%", h: "35%" } },
-  { src: "/img4.jpg", aspect: "aspect-3/4", depth: 0.45, d: { x: "77%", y: "72%", h: "56%" }, m: { x: "81%", y: "80%", h: "37%" } },
+  { src: "/img1.JPG", aspect: "aspect-3/4", depth: 0.9, d: { x: "15%", y: "30%", h: "56%" }, m: { x: "3%", y: "24%", h: "40%" } },
+  { src: "/img2.jpg", aspect: "aspect-4/5", depth: 0.6, d: { x: "24%", y: "73%", h: "51%" }, m: { x: "8%", y: "77%", h: "38%" } },
+  { src: "/img5.jpeg", aspect: "aspect-4/5", depth: 0, d: { x: "50%", y: "50%", h: "100%" }, m: { x: "50%", y: "50%", h: "68%" } },
+  { src: "/img3.JPG", aspect: "aspect-4/5", depth: 0.8, d: { x: "85%", y: "27%", h: "53%" }, m: { x: "97%", y: "25%", h: "39%" } },
+  { src: "/img4.jpg", aspect: "aspect-3/4", depth: 0.45, d: { x: "77%", y: "72%", h: "56%" }, m: { x: "92%", y: "78%", h: "41%" } },
 ];
 
 /** How far the cluster leans toward the cursor, in px, before depth damping. */
