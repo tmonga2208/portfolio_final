@@ -2,9 +2,15 @@
 
 import Image from "next/image";
 import { motion, type Variants } from "framer-motion";
-import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** All five photos, washed in behind the hero one at a time. */
+const PHOTOS = ["/img5.jpeg", "/img1.JPG", "/img3.JPG", "/img2.jpg", "/img4.jpg"];
+
+const HOLD_MS = 6000;
 
 const wordmark: Variants = {
   hidden: {},
@@ -17,28 +23,61 @@ const letter: Variants = {
 };
 
 /**
- * The five photos, as a staggered band rather than a centred row.
+ * The photo behind the wordmark, cross-fading through all five.
  *
- * `height` is a fraction of the band, not a width — sizing by height is what lets
- * them fill it. Sized by width (the old approach) a phone-sized column left a
- * 112px photo adrift in a 388px box. Widths follow from the aspect ratio.
- *
- * `shift` drops each one to a different baseline so the band reads as a
- * composition instead of a row of stamps.
+ * All five are stacked and only their opacity moves, so the incoming frame is
+ * already decoded when its turn comes — swapping the src would flash.
  */
-const PHOTOS = [
-  { src: "/img1.JPG", height: "72%", shift: "-6%", aspect: "aspect-square md:aspect-3/4", wide: false },
-  { src: "/img2.jpg", height: "56%", shift: "16%", aspect: "aspect-square md:aspect-3/4", wide: false },
-  // Spans both columns on mobile. Five photos into a two-column grid otherwise
-  // strands the last one alone on its own row.
-  { src: "/img5.jpeg", height: "100%", shift: "-2%", aspect: "aspect-16/9 md:aspect-4/5", wide: true },
-  { src: "/img3.JPG", height: "62%", shift: "18%", aspect: "aspect-square md:aspect-3/4", wide: false },
-  { src: "/img4.jpg", height: "80%", shift: "-4%", aspect: "aspect-square md:aspect-3/4", wide: false },
-];
+function Backdrop() {
+  const [index, setIndex] = useState(0);
+  const reducedMotion = usePrefersReducedMotion();
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % PHOTOS.length), HOLD_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 z-0">
+      {PHOTOS.map((src, i) => (
+        <motion.div
+          key={src}
+          className="absolute inset-0"
+          initial={false}
+          animate={{
+            opacity: i === index ? 1 : 0,
+            // A slow drift while it holds. Opacity alone is fine under reduced
+            // motion; the scale is what would need suppressing.
+            scale: reducedMotion ? 1 : i === index ? 1 : 1.06,
+          }}
+          transition={{
+            opacity: { duration: 1.6, ease: "easeInOut" },
+            scale: { duration: HOLD_MS / 1000 + 2, ease: "linear" },
+          }}
+        >
+          <Image
+            src={src}
+            alt=""
+            fill
+            priority={i === 0}
+            sizes="100vw"
+            className="object-cover object-center opacity-[0.18] md:opacity-[0.22]"
+          />
+        </motion.div>
+      ))}
+
+      {/* Wash of the page colour over the photo — solid at the bottom, where the
+          type sits, so the wordmark keeps its contrast whichever photo is up. */}
+      <div className="absolute inset-0 bg-linear-to-b from-background via-background/55 to-background" />
+    </div>
+  );
+}
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[88svh] flex-col justify-between overflow-hidden pt-24 pb-10 md:min-h-[96vh] md:pt-28">
+    <section className="relative flex min-h-[80svh] flex-col justify-between overflow-hidden pt-24 pb-10 md:min-h-[92vh] md:pt-28">
+      <Backdrop />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -49,35 +88,6 @@ export function Hero() {
         <span className="hidden md:block">Frontend &amp; Design Systems</span>
         <span>Est. 2025</span>
       </motion.div>
-
-      {/* The band. Height-driven and full-bleed from md up so the photos reach the
-          edges; a wrapped collage below that, where five across a phone would only
-          ever be postage stamps. */}
-      <div className="my-8 w-full px-4 md:my-6 md:h-[52vh] md:px-6">
-        <div className="grid h-full grid-cols-2 items-center gap-3 md:flex md:flex-nowrap md:justify-between md:gap-4">
-          {PHOTOS.map((photo, i) => (
-            <motion.div
-              key={photo.src}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.08 * i, ease: EASE }}
-              style={{ "--h": photo.height, "--dy": photo.shift } as CSSProperties}
-              className={`media-frame relative overflow-hidden rounded-2xl border border-border md:w-auto md:h-[var(--h)] md:translate-y-[var(--dy)] ${photo.aspect} ${
-                photo.wide ? "col-span-2 md:col-span-1" : ""
-              }`}
-            >
-              <Image
-                src={photo.src}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 50vw, 22vw"
-                className="object-cover"
-                priority={i === 2}
-              />
-            </motion.div>
-          ))}
-        </div>
-      </div>
 
       <div className="relative z-10 mx-6 md:mx-10">
         <motion.h1
