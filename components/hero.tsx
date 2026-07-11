@@ -28,18 +28,21 @@ const letter: Variants = {
  * The scattered composition from the WebGL gallery, rebuilt in DOM: a large centre
  * photo with four satellites set back from it.
  *
- * `x`/`y` place the centre of each frame in the band. `height` is a fraction of the
- * band — sizing by height is what makes them fill it; the width follows from the
- * aspect ratio. `depth` is how far back the photo sits: it damps the parallax,
- * softens the shadow and drops it behind the ones in front, which is what gives the
- * cluster its layering.
+ * `x`/`y` place the centre of each frame in the band, `h` is its height as a
+ * fraction of the band (sizing by height is what makes them fill it; the width
+ * follows from the aspect ratio). Phones get their own coordinates — `m` — because
+ * the desktop spread would run off the edges.
+ *
+ * `depth` is how far back a photo sits, and it drives three things at once: it damps
+ * the parallax, softens the shadow, and drops the photo behind the ones in front.
+ * That is what gives the cluster its layering.
  */
 const PHOTOS = [
-  { src: "/img1.JPG", x: "15%", y: "30%", height: "56%", depth: 0.9, aspect: "aspect-square md:aspect-3/4", wide: false },
-  { src: "/img2.jpg", x: "24%", y: "73%", height: "51%", depth: 0.6, aspect: "aspect-square md:aspect-4/5", wide: false },
-  { src: "/img5.jpeg", x: "50%", y: "50%", height: "100%", depth: 0, aspect: "aspect-16/9 md:aspect-3/4", wide: true },
-  { src: "/img3.JPG", x: "85%", y: "27%", height: "53%", depth: 0.8, aspect: "aspect-square md:aspect-4/5", wide: false },
-  { src: "/img4.jpg", x: "77%", y: "72%", height: "56%", depth: 0.45, aspect: "aspect-square md:aspect-3/4", wide: false },
+  { src: "/img1.JPG", aspect: "aspect-3/4", depth: 0.9, d: { x: "15%", y: "30%", h: "56%" }, m: { x: "17%", y: "20%", h: "36%" } },
+  { src: "/img2.jpg", aspect: "aspect-4/5", depth: 0.6, d: { x: "24%", y: "73%", h: "51%" }, m: { x: "19%", y: "82%", h: "34%" } },
+  { src: "/img5.jpeg", aspect: "aspect-4/5", depth: 0, d: { x: "50%", y: "50%", h: "100%" }, m: { x: "50%", y: "50%", h: "66%" } },
+  { src: "/img3.JPG", aspect: "aspect-4/5", depth: 0.8, d: { x: "85%", y: "27%", h: "53%" }, m: { x: "83%", y: "22%", h: "35%" } },
+  { src: "/img4.jpg", aspect: "aspect-3/4", depth: 0.45, d: { x: "77%", y: "72%", h: "56%" }, m: { x: "81%", y: "80%", h: "37%" } },
 ];
 
 /** How far the cluster leans toward the cursor, in px, before depth damping. */
@@ -69,15 +72,16 @@ function Frame({
     <div
       style={
         {
-          "--x": photo.x,
-          "--y": photo.y,
-          "--h": photo.height,
+          "--x": photo.m.x,
+          "--y": photo.m.y,
+          "--h": photo.m.h,
+          "--dx": photo.d.x,
+          "--dy": photo.d.y,
+          "--dh": photo.d.h,
           zIndex: Math.round((1 - photo.depth) * 10),
         } as CSSProperties
       }
-      className={`md:absolute md:left-[var(--x)] md:top-[var(--y)] md:h-[var(--h)] md:w-auto md:-translate-x-1/2 md:-translate-y-1/2 ${
-        photo.wide ? "col-span-2 md:col-span-1" : ""
-      }`}
+      className="absolute left-[var(--x)] top-[var(--y)] h-[var(--h)] w-auto -translate-x-1/2 -translate-y-1/2 md:left-[var(--dx)] md:top-[var(--dy)] md:h-[var(--dh)]"
     >
       {/* Parallax */}
       <motion.div className="h-full w-full" style={reducedMotion ? undefined : { x, y }}>
@@ -146,7 +150,10 @@ function Gallery() {
       ref={bandRef}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
-      className="my-8 grid w-full grid-cols-2 items-center gap-3 px-4 md:relative md:my-4 md:block md:h-[58vh] md:px-6"
+      // Height-bounded on both. A scatter overlaps, so it packs into less height than
+      // a grid of the same photos — which is what keeps the wordmark clear of the
+      // player card pinned to the bottom of a phone's viewport.
+      className="relative my-6 h-[52svh] w-full px-4 md:my-4 md:h-[58vh] md:px-6"
     >
       {PHOTOS.map((photo, i) => (
         <Frame
