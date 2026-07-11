@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} antialiased`}
       >
         <ScrollProgress />
-        <Player imgurl="/doggy/doggy.png" mp3url="/doggy/doggy.mp3" name="Doggy (feat. Love Spells and Truly Young)" artist='Geezer, Kevin Abstract, Dominic Fike' />
+        <Player />
         {children}
       </body>
     </html>
