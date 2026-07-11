@@ -26,13 +26,19 @@ const letter: Variants = {
   show: { y: 0, transition: { duration: 0.9, ease: EASE } },
 };
 
-/** All five photos, ordered to mirror the 3D composition: tall centre, smaller flanks. */
+/**
+ * All five photos, ordered to mirror the 3D composition: tall centre, smaller flanks.
+ *
+ * Five across a phone leaves each one about 55px wide — too small to read as a
+ * photograph. The outer pair drops below `md` so the remaining three can be
+ * roughly twice the size; `mobileWidth` is what they take once that happens.
+ */
 const PHOTOS = [
-  { src: "/img1.JPG", width: "16%", aspect: "aspect-3/4" },
-  { src: "/img2.jpg", width: "16%", aspect: "aspect-3/4" },
-  { src: "/img5.jpeg", width: "26%", aspect: "aspect-4/5" },
-  { src: "/img3.JPG", width: "16%", aspect: "aspect-3/4" },
-  { src: "/img4.jpg", width: "16%", aspect: "aspect-3/4" },
+  { src: "/img1.JPG", width: "16%", mobileWidth: null, aspect: "aspect-3/4" },
+  { src: "/img2.jpg", width: "16%", mobileWidth: "26%", aspect: "aspect-3/4" },
+  { src: "/img5.jpeg", width: "26%", mobileWidth: "40%", aspect: "aspect-4/5" },
+  { src: "/img3.JPG", width: "16%", mobileWidth: "26%", aspect: "aspect-3/4" },
+  { src: "/img4.jpg", width: "16%", mobileWidth: null, aspect: "aspect-3/4" },
 ];
 
 /**
@@ -42,21 +48,28 @@ const PHOTOS = [
  */
 function StaticGallery() {
   return (
-    <div className="flex h-full w-full items-center justify-center gap-3 px-4 md:gap-5">
+    <div className="flex h-full w-full items-center justify-center gap-2 px-3 md:gap-5 md:px-4">
       {PHOTOS.map((photo, i) => (
         <motion.div
           key={photo.src}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.08 * i, ease: EASE }}
-          style={{ width: photo.width }}
-          className={`media-frame relative overflow-hidden rounded-2xl border border-border ${photo.aspect}`}
+          style={
+            {
+              "--w": photo.width,
+              "--w-mobile": photo.mobileWidth ?? photo.width,
+            } as React.CSSProperties
+          }
+          className={`media-frame relative overflow-hidden rounded-2xl border border-border w-[var(--w-mobile)] md:w-[var(--w)] ${photo.aspect} ${
+            photo.mobileWidth ? "" : "hidden md:block"
+          }`}
         >
           <Image
             src={photo.src}
             alt=""
             fill
-            sizes="(max-width: 768px) 30vw, 25vw"
+            sizes="(max-width: 768px) 40vw, 25vw"
             className="object-cover"
             priority={i === 2}
           />
@@ -103,7 +116,10 @@ export function Hero() {
   const useCanvas = mounted && !isMobile && !reducedMotion && !canvasFailed;
 
   return (
-    <section className="relative flex min-h-[92vh] flex-col justify-between overflow-hidden pt-28 pb-10">
+    // No min-height on phones. Combined with justify-between it forced the gap
+    // between the header, the photos and the wordmark open to fill the viewport;
+    // on mobile the section is now as tall as what's actually in it.
+    <section className="relative flex flex-col justify-between overflow-hidden pt-24 pb-10 md:min-h-[92vh] md:pt-28">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -117,9 +133,16 @@ export function Hero() {
 
       {/* Gallery. The DOM photos stay mounted underneath and only fade out once the
           canvas has its textures, so there is never an empty frame. */}
-      <div className="relative my-6 h-[46vh] min-h-[280px] w-full md:h-[52vh]">
+      {/* Height is content-driven on mobile. The fixed 46vh was sized for the WebGL
+          canvas, which never runs on phones, so it just left dead space under the
+          photos. The canvas needs a real height, hence md:h-[52vh]. */}
+      <div className="relative my-8 w-full md:my-6 md:h-[52vh] md:min-h-[280px]">
+        {/* In flow on mobile so the photos give the container its height; absolutely
+            positioned from md up, where it sits under the canvas and the parent has
+            a fixed height of its own. `absolute inset-0` against an auto-height
+            parent collapses to nothing and the photos spill over the wordmark. */}
         <div
-          className={`absolute inset-0 transition-opacity duration-700 ${
+          className={`relative md:absolute md:inset-0 transition-opacity duration-700 ${
             useCanvas && canvasReady ? "opacity-0" : "opacity-100"
           }`}
         >
