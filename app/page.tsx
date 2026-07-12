@@ -4,32 +4,24 @@ import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import ClickSpark from "@/components/ClickSpark";
-import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
-import { LinkPreview } from "@/components/ui/link-preview";
-import { IOSFolder } from "@/components/ios-folder";
+import { TravelPolaroid } from "@/components/travel-polaroid";
 import { blogData } from "@/types/blog";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
 import { Magnetic } from "@/components/magnetic";
-import { TechStack, Tools } from "@/components/tech-grid";
+import { TechGrid } from "@/components/tech-grid";
 import { ExperienceList } from "@/components/experience";
+import { ShowcaseList, type ShowcaseEntry } from "@/components/showcase-list";
 
-type Entry = {
-  title: string;
-  url: string;
-  period: string;
-  blurb: string;
-  images: { src: string; alt: string }[];
-};
-
-const WORK: Entry[] = [
+const WORK: ShowcaseEntry[] = [
   {
     title: "Chauhan Sports",
     url: "https://www.chauhansports.com",
     period: "August 2025 — Present",
     blurb:
-      "Designed and developed the official website for Chauhan Sports, delivering a professional and brand-aligned digital presence. Led the complete brand identity process, including logo design, professional visiting cards, and visual guidelines. Built and managed the brand’s social media presence, creating a strong and consistent online identity across platforms.",
+      "Complete brand build for a sports retailer — website, logo, visiting cards, and a consistent identity across social platforms.",
+    tags: ["Web Design", "Branding", "Logo Design", "Social Media"],
     images: [
       { src: "/chauhan/image.png", alt: "Chauhan Sports - Screenshot 1" },
       { src: "/chauhan/img2.png", alt: "Chauhan Sports - Screenshot 2" },
@@ -41,7 +33,8 @@ const WORK: Entry[] = [
     url: "https://www.theresolutemind.in",
     period: "January 2025 — Present",
     blurb:
-      "Designed and developed the official website for The Resolute Mind, delivering a professional, brand-aligned digital presence. Focused on clean visual design, intuitive user experience, and responsive layouts to ensure clarity, accessibility, and consistent performance across devices.",
+      "Official website with clean visual design and an intuitive, responsive experience that stays consistent across devices.",
+    tags: ["Web Design", "UI/UX", "Responsive"],
     images: [
       { src: "/resolute/i1.png", alt: "The Resolute Mind - Screenshot 1" },
       { src: "/resolute/i4.png", alt: "The Resolute Mind - Screenshot 2" },
@@ -50,13 +43,14 @@ const WORK: Entry[] = [
   },
 ];
 
-const PROJECTS: Entry[] = [
+const PROJECTS: ShowcaseEntry[] = [
   {
     title: "Forgestack",
     url: "https://forgestack.vercel.app/",
     period: "January 2025 — Present",
     blurb:
-      "ForgeStack is a custom full-stack starter framework I designed and built to streamline modern web development. It provides a structured, scalable foundation with a guided CLI setup, opinionated best practices, and seamless integration of modern tools—helping developers move from setup to building real features faster.",
+      "A full-stack starter framework with a guided CLI and opinionated defaults — from empty folder to real features, faster.",
+    tags: ["TypeScript", "CLI", "Full-stack", "Open Source"],
     images: [
       { src: "/forge/i1.png", alt: "Forgestack - Screenshot 1" },
       { src: "/forge/i2.png", alt: "Forgestack - Screenshot 2" },
@@ -68,7 +62,8 @@ const PROJECTS: Entry[] = [
     url: "https://subpip.vercel.app/",
     period: "January 2025",
     blurb:
-      "Watch videos with a floating window that stays on top of other applications, complete with playback controls and seamlessly integrated subtitles for a superior viewing experience.",
+      "A floating always-on-top video player with playback controls and seamlessly integrated subtitles.",
+    tags: ["React", "Picture-in-Picture", "Subtitles"],
     images: [
       { src: "/subpip/i1.png", alt: "SubPIP - Screenshot 1" },
       { src: "/subpip/i2.png", alt: "SubPIP - Screenshot 2" },
@@ -117,42 +112,6 @@ function Nav() {
         </div>
       </div>
     </motion.header>
-  );
-}
-
-/** One work/project entry: meta column on the left, screenshots on the right. */
-function EntryRow({ entry, number }: { entry: Entry; number: string }) {
-  return (
-    <Reveal>
-      <article className="entry-row group flex flex-col gap-8 border-b border-border py-14 md:flex-row md:gap-12">
-        <div className="flex shrink-0 flex-col justify-center md:w-[320px]">
-          <span className="mb-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            {number}
-          </span>
-          <div className="mb-3 flex items-center gap-2">
-            <svg
-              className="entry-icon size-5 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-            </svg>
-            <LinkPreview url={entry.url} className="text-3xl font-bold">
-              {entry.title}
-            </LinkPreview>
-          </div>
-          <p className="mb-6 text-sm text-muted-foreground">{entry.period}</p>
-          <p className="text-lg leading-relaxed text-foreground/80">{entry.blurb}</p>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <AutoScrollCarousel images={entry.images} />
-        </div>
-      </article>
-    </Reveal>
   );
 }
 
@@ -207,39 +166,25 @@ export default function Home() {
         {/* 03 — Work */}
         <section id="work" className="scroll-mt-24 px-6 pt-24 md:px-10 md:pt-32">
           <SectionHeading index="03 / Selected Work">Work</SectionHeading>
-          <div className="mt-8">
-            {WORK.map((entry, i) => (
-              <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
-            ))}
-          </div>
+          <Reveal className="mt-12">
+            <ShowcaseList entries={WORK} variant="work" />
+          </Reveal>
         </section>
 
         {/* 04 — Projects */}
         <section className="px-6 pt-24 md:px-10 md:pt-32">
           <SectionHeading index="04 / Things I Built">Projects</SectionHeading>
-          <div className="mt-8">
-            {PROJECTS.map((entry, i) => (
-              <EntryRow key={entry.title} entry={entry} number={String(i + 1).padStart(2, "0")} />
-            ))}
-          </div>
+          <Reveal className="mt-12">
+            <ShowcaseList entries={PROJECTS} variant="project" />
+          </Reveal>
         </section>
 
         {/* 05 — Stack */}
         <section id="stack" className="scroll-mt-24 px-6 py-24 md:px-10 md:py-32">
           <SectionHeading index="05 / Tools of the Trade">Stack</SectionHeading>
-          <div className="mt-14 flex flex-col gap-16">
-            <Reveal>
-              <TechStack />
-            </Reveal>
-            <div>
-              <p className="mb-6 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                Also familiar with
-              </p>
-              <Reveal>
-                <Tools />
-              </Reveal>
-            </div>
-          </div>
+          <Reveal className="mt-14">
+            <TechGrid />
+          </Reveal>
         </section>
 
         {/* 06 — Beyond the code */}
@@ -247,13 +192,14 @@ export default function Home() {
           <SectionHeading index="06 / Beyond the Code">Travel</SectionHeading>
           <Reveal>
             <p className="mt-14 max-w-2xl text-2xl leading-snug text-muted-foreground">
-              Some places I&apos;ve been. Open a folder.
+              Some places I&apos;ve been. Open a photo pile.
             </p>
           </Reveal>
-          <RevealGroup className="mt-10 flex flex-wrap gap-8">
+          {/* Inset so the hover fan-out never clips at the viewport edge. */}
+          <RevealGroup className="mt-14 flex flex-wrap gap-x-24 gap-y-16 px-6 md:px-16">
             {blogData.map((blog) => (
               <RevealItem key={blog.id}>
-                <IOSFolder blog={blog} />
+                <TravelPolaroid blog={blog} />
               </RevealItem>
             ))}
           </RevealGroup>

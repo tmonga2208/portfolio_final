@@ -213,21 +213,6 @@ html {
   transform: scale(1.06);
 }
 
-/* Work / project rows. */
-.entry-row {
-  transition: border-color 0.5s ease;
-}
-.entry-row:hover {
-  border-color: color-mix(in oklab, #043360 30%, transparent);
-}
-.entry-row .entry-icon {
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s ease;
-}
-.entry-row:hover .entry-icon {
-  transform: rotate(-45deg) scale(1.1);
-  color: #043360;
-}
-
 /* Tech grid cells. */
 .tech-cell svg,
 .tech-cell img,
