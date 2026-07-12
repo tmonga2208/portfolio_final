@@ -106,4 +106,37 @@ export const blogData: BlogContent[] = [
             },
         ],
     },
+    {
+        id: "travel-doon-mussoorie",
+        title: "Doon & Landour",
+        subtitle: "A family trip through Dehradun and Mussoorie",
+        location: "Dehradun & Mussoorie, Uttarakhand, India",
+        heroImage: "/travel/dm2.jpg",
+        thumbnails: ["/travel/dm2.jpg", "/travel/dm1.jpg"],
+        sections: [
+            {
+                type: "text",
+                content:
+                    "This one was different — no backpacks, no friends' playlists, just family. We started in Dehradun, and the city moved at exactly the pace a family trip should: unhurried mornings, long breakfasts, and everyone with an opinion on where to go next.",
+            },
+            {
+                type: "image",
+                content: "/travel/dm2.jpg",
+            },
+            {
+                type: "text",
+                content:
+                    "The Forest Research Institute stopped us in our tracks. Colonial brick, endless lawns, and corridors that make you lower your voice without knowing why. We walked the grounds slowly, took too many photos, and agreed it was the kind of place pictures don't quite do justice to.",
+            },
+            {
+                type: "image",
+                content: "/travel/dm1.jpg",
+            },
+            {
+                type: "text",
+                content:
+                    "Then up the winding road to Mussoorie, and further still to Landour. Evening found us outside the Landour Bakehouse — warm light, cold air, and cake worth the queue. Travelling with family is a different rhythm: slower, louder at dinner, quieter on the drives. It suited the hills perfectly.",
+            },
+        ],
+    },
 ]

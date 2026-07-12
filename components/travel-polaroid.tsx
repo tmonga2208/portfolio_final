@@ -44,6 +44,9 @@ export function TravelPolaroid({ blog }: { blog: BlogContent }) {
   }, [isOpen]);
 
   const photos = blog.thumbnails.slice(0, 3);
+  // With fewer than 3 photos, skip the earliest poses so the last photo still
+  // lands the straight cover pose instead of a tilted background one.
+  const poseOffset = CARD_POSES.length - photos.length;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -62,7 +65,7 @@ export function TravelPolaroid({ blog }: { blog: BlogContent }) {
         {photos.map((src, i) => (
           <motion.div
             key={src}
-            variants={CARD_POSES[i]}
+            variants={CARD_POSES[i + poseOffset]}
             transition={{ duration: 0.5, ease: EASE }}
             className="absolute inset-0 m-auto h-fit w-40 rotate-0 rounded-sm border border-black/5 bg-white p-2 pb-8 shadow-[0_12px_30px_-12px_rgb(0_0_0/0.4)] md:w-44"
           >
