@@ -24,10 +24,9 @@ const TOP_ROW: Photo[] = [
 const BOTTOM_ROW: Photo[] = [
   { src: "/gallery/g07.jpg", width: 933, height: 1400, caption: "Happy wedding, Di" },
   { src: "/gallery/g08.jpg", width: 1400, height: 1050, caption: "Cute moments with my Dis" },
-  { src: "/gallery/g09.jpg", width: 1400, height: 787, caption: "My random cute kid pic" },
+  { src: "/gallery/g12.png", width: 1034, height: 1400, caption: "Cutest kid me" },
   { src: "/gallery/g10.jpg", width: 1400, height: 960, caption: "Mom & Dad's 25th anniversary" },
   { src: "/gallery/g11.jpg", width: 1400, height: 1049, caption: "Best trip memory" },
-  { src: "/gallery/g12.png", width: 1034, height: 1400, caption: "Cutest kid me" },
 ];
 
 function MarqueeRow({ photos, reverse = false }: { photos: Photo[]; reverse?: boolean }) {
