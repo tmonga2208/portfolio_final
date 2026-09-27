@@ -139,4 +139,37 @@ export const blogData: BlogContent[] = [
             },
         ],
     },
+    {
+        id: "travel-goa-palolem",
+        title: "Goa, Monsoon Edition",
+        subtitle: "A monsoon Rakshabandhan trip to Palolem with Di",
+        location: "Palolem, South Goa, India",
+        heroImage: "/travel/goa1.jpg",
+        thumbnails: ["/travel/goa2.jpg", "/travel/goa1.jpg"],
+        sections: [
+            {
+                type: "text",
+                content:
+                    "This one was a Rakshabandhan gift — a trip to Goa with Di. Everyone pictures Goa as sunshine and packed beaches. We got the monsoon version instead, and honestly, it might be the better one.",
+            },
+            {
+                type: "image",
+                content: "/travel/goa2.jpg",
+            },
+            {
+                type: "text",
+                content:
+                    "Palolem in the rains is something else. Heavy grey skies, green hills rolling straight down to the sand, and the tide leaving the whole beach glassy enough to walk on your own reflection. Barely anyone around — just us, the waves, and clouds that couldn't decide when to break.",
+            },
+            {
+                type: "image",
+                content: "/travel/goa1.jpg",
+            },
+            {
+                type: "text",
+                content:
+                    "Our stay turned out to be properly in the woods — a little too deep into them — so we ended up booking a new hotel for a day. Not the plan, but that's half the fun of a trip. Scenic, rainy, slightly chaotic, and a lot of fun.",
+            },
+        ],
+    },
 ]
