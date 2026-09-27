@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --animate-marquee: marquee 60s linear infinite;
-  --animate-marquee-reverse: marquee 60s linear infinite reverse;
+  --animate-marquee: marquee 25s linear infinite;
+  --animate-marquee-reverse: marquee 25s linear infinite reverse;
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
