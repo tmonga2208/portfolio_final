@@ -15,18 +15,19 @@ type Photo = {
 const TOP_ROW: Photo[] = [
   { src: "/gallery/g01.jpg", width: 1050, height: 1400, caption: "Fun with friends" },
   { src: "/gallery/g02.jpg", width: 933, height: 1400, caption: "Happy haldi, Di" },
-  { src: "/gallery/g03.jpg", width: 1037, height: 1400, caption: "" },
+  { src: "/gallery/g03.jpg", width: 1037, height: 1400, caption: "Corporate majdoor — just my everyday" },
   { src: "/gallery/g04.jpg", width: 1050, height: 1400, caption: "Rakhi with my sisters" },
   { src: "/gallery/g05.jpg", width: 1050, height: 1400, caption: "Harishchandragad — birthday trip 2026" },
-  { src: "/gallery/g06.jpg", width: 1050, height: 1400, caption: "" },
+  { src: "/gallery/g06.jpg", width: 1050, height: 1400, caption: "Fun Goa trip 2026" },
 ];
 
 const BOTTOM_ROW: Photo[] = [
   { src: "/gallery/g07.jpg", width: 933, height: 1400, caption: "Happy wedding, Di" },
   { src: "/gallery/g08.jpg", width: 1400, height: 1050, caption: "Cute moments with my Dis" },
-  { src: "/gallery/g09.jpg", width: 1400, height: 787, caption: "" },
+  { src: "/gallery/g09.jpg", width: 1400, height: 787, caption: "My random cute kid pic" },
   { src: "/gallery/g10.jpg", width: 1400, height: 960, caption: "Mom & Dad's 25th anniversary" },
   { src: "/gallery/g11.jpg", width: 1400, height: 1049, caption: "Best trip memory" },
+  { src: "/gallery/g12.png", width: 1034, height: 1400, caption: "Cutest kid me" },
 ];
 
 function MarqueeRow({ photos, reverse = false }: { photos: Photo[]; reverse?: boolean }) {
