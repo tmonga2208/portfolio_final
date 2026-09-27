@@ -13,6 +13,7 @@ import { Magnetic } from "@/components/magnetic";
 import { TechGrid } from "@/components/tech-grid";
 import { ExperienceList } from "@/components/experience";
 import { ShowcaseList, type ShowcaseEntry } from "@/components/showcase-list";
+import { GalleryMarquee } from "@/components/gallery-marquee";
 
 const WORK: ShowcaseEntry[] = [
   {
@@ -205,11 +206,21 @@ export default function Home() {
           </RevealGroup>
         </section>
 
-        {/* 07 — Contact */}
+        {/* 07 — Gallery */}
+        <section id="gallery" className="scroll-mt-24 pb-24 md:pb-32">
+          <div className="px-6 md:px-10">
+            <SectionHeading index="07 / Moments">My Gallery</SectionHeading>
+          </div>
+          <Reveal className="mt-14">
+            <GalleryMarquee />
+          </Reveal>
+        </section>
+
+        {/* 08 — Contact */}
         <section id="contact" className="scroll-mt-24 border-t border-border px-6 py-24 md:px-10 md:py-32">
           <Reveal>
             <p className="mb-10 text-xs uppercase tracking-[0.25em] text-muted-foreground">
-              07 / Contact
+              08 / Contact
             </p>
           </Reveal>
           <Reveal>
