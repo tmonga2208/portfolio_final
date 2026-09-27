@@ -95,6 +95,9 @@ export function Player() {
     const [player, setPlayer] = useState<Spotify.Player | null>(null);
     const [deviceId, setDeviceId] = useState<string | null>(null);
     const [isPlayerReady, setIsPlayerReady] = useState(false);
+    // Why the in-browser player couldn't start, if it couldn't. Null while it's
+    // still connecting, so the queue doesn't flash a warning on every load.
+    const [playerError, setPlayerError] = useState<string | null>(null);
     const [isPaused, setIsPaused] = useState(true);
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track | null>(null);
     const [position, setPosition] = useState(0);
@@ -148,6 +151,7 @@ export function Player() {
         const token = await fetchAccessToken();
         if (!token) {
             console.error("No access token available");
+            setPlayerError("Couldn't connect to Spotify.");
             return null;
         }
 
@@ -165,17 +169,21 @@ export function Player() {
 
         spotifyPlayer.addListener("initialization_error", ({ message }) => {
             console.error("Init Error:", message);
+            setPlayerError("This browser can't play Spotify here.");
         });
         spotifyPlayer.addListener("authentication_error", ({ message }) => {
             console.error("Auth Error:", message);
+            setPlayerError("Couldn't connect to Spotify.");
         });
         spotifyPlayer.addListener("account_error", ({ message }) => {
             console.error("Account Error:", message);
+            setPlayerError("Spotify Premium is required to play in the browser.");
         });
 
         spotifyPlayer.addListener("ready", ({ device_id }) => {
             setDeviceId(device_id);
             setIsPlayerReady(true);
+            setPlayerError(null);
         });
 
         spotifyPlayer.addListener("not_ready", () => {
@@ -657,10 +665,10 @@ export function Player() {
                         className={`overflow-hidden transition-all duration-300 ease-in-out bg-[#121212] border-x border-b border-white/5 rounded-b-2xl mx-1 shadow-xl ${showQueue ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}
                     >
                         <div className="p-3 pt-4 space-y-2 max-h-72 overflow-y-auto">
-                            {!isPlayerReady && (
+                            {!isPlayerReady && playerError && (
                                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-3">
                                     <p className="text-xs text-yellow-400">
-                                        ⚠️ Spotify Premium required to play in browser. Click a track to open in Spotify app.
+                                        ⚠️ {playerError} Click a track to open it in Spotify.
                                     </p>
                                 </div>
                             )}
