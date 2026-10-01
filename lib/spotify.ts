@@ -116,6 +116,35 @@ export async function getNowPlaying() {
     };
 }
 
+/**
+ * Tarun's most-played tracks of roughly the last month. Needs the user-top-read
+ * scope on the refresh token; without it Spotify answers 403 and this is empty.
+ */
+export async function getTopTracks(limit = 5) {
+    const { access_token } = await getAccessToken();
+
+    const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${limit}`, {
+        headers: {
+            Authorization: `Bearer ${access_token}`,
+        },
+        cache: "no-store",
+    });
+
+    if (!response.ok) {
+        return [];
+    }
+
+    const data: { items: SpotifyTrack[] } = await response.json();
+
+    return data.items.map((track) => ({
+        title: track.name,
+        artist: track.artists.map((artist) => artist.name).join(", "),
+        // Images come largest first; the ~300px one is plenty for a thumbnail.
+        albumImageUrl: track.album.images[1]?.url ?? track.album.images[0]?.url,
+        songUrl: track.external_urls.spotify,
+    }));
+}
+
 export async function getPlaylist(playlistId: string) {
     const { access_token } = await getAccessToken();
 

@@ -26,11 +26,8 @@ function Equalizer() {
   );
 }
 
-/**
- * A one-line "currently listening to" for the footer, straight from Tarun's
- * Spotify. Shows nothing when nothing is playing, rather than a stale track.
- */
-export function NowPlayingBadge() {
+/** What Tarun's Spotify is playing, polled once a minute. Null until known. */
+export function useNowPlaying() {
   const [data, setData] = useState<NowPlaying | null>(null);
 
   useEffect(() => {
@@ -52,6 +49,16 @@ export function NowPlayingBadge() {
       clearInterval(id);
     };
   }, []);
+
+  return data;
+}
+
+/**
+ * A one-line "currently listening to" for the footer, straight from Tarun's
+ * Spotify. Shows nothing when nothing is playing, rather than a stale track.
+ */
+export function NowPlayingBadge() {
+  const data = useNowPlaying();
 
   if (!data?.isPlaying || !data.title) return null;
 

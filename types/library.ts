@@ -323,4 +323,12 @@ export const books: Book[] = [
         status: "read",
         buyLink: "https://www.amazon.in/s?k=The+Shadow+Crosser+J+C+Cervantes"
     },
+    {
+        id: 40,
+        title: "A Beginner's Guide to the Indian Stock Market",
+        author: "Karthik Rangappa",
+        coverUrl: "https://m.media-amazon.com/images/P/936989876X.01.L.jpg",
+        status: "reading",
+        buyLink: "https://www.amazon.in/Beginners-Indian-Creator-Zerodha-Varsity/dp/936989876X"
+    },
 ];

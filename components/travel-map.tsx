@@ -2,15 +2,18 @@
 
 import { motion } from "framer-motion";
 import type { BlogContent } from "@/types/blog";
-import { cn } from "@/lib/utils";
+import { ALSO_VISITED, HOME, NOW } from "@/types/places";
 
 /*
- * A plain equirectangular chart rather than a drawn map: the trips sit on a
+ * A plain equirectangular chart rather than a drawn map: the places sit on a
  * lat/long grid with no country outline, so there's no geography to get wrong
  * and no map library to ship. Longitude is squeezed by cos(24°) — the middle
  * of the range — so distances read roughly true.
+ *
+ * No labels on the chart itself: every marker is named by the site's cursor
+ * label on hover (data-cursor-text), which keeps the crowded north readable.
  */
-const BOUNDS = { west: 68, east: 84, north: 35, south: 13 };
+const BOUNDS = { west: 69, east: 87, north: 35, south: 13 };
 const SCALE = 24;
 const LNG_SQUEEZE = Math.cos((24 * Math.PI) / 180);
 const WIDTH = (BOUNDS.east - BOUNDS.west) * LNG_SQUEEZE * SCALE;
@@ -22,43 +25,7 @@ const project = ({ lat, lng }: { lat: number; lng: number }) => ({
 });
 
 const LATS = [15, 20, 25, 30];
-
-/** Labels are 12px uppercase with wide tracking: about this many viewBox units a character. */
-const LABEL_CHAR_WIDTH = 8.6;
-const LABEL_GAP = 12;
-const labelWidth = (text: string) => text.length * LABEL_CHAR_WIDTH;
-
-/** Split a name at the space that best balances its two halves. */
-function splitInTwo(name: string): string[] {
-  const words = name.split(" ");
-  let best: string[] = [name];
-  let bestDiff = Infinity;
-  for (let i = 1; i < words.length; i++) {
-    const a = words.slice(0, i).join(" ");
-    const b = words.slice(i).join(" ");
-    const diff = Math.abs(a.length - b.length);
-    if (diff < bestDiff) {
-      best = [a, b];
-      bestDiff = diff;
-    }
-  }
-  return best;
-}
-
-/**
- * Where a pin's label goes: its preferred side on one line, else that side on
- * two lines, else the other side — so no label runs off the edge of the map.
- */
-function placeLabel(name: string, x: number, preferLeft: boolean) {
-  const room = { left: x - LABEL_GAP - 4, right: WIDTH - x - LABEL_GAP - 4 };
-  const sides = preferLeft ? (["left", "right"] as const) : (["right", "left"] as const);
-  const options = sides.flatMap((side) => [
-    { side, lines: [name] },
-    { side, lines: splitInTwo(name) },
-  ]);
-  return options.find(({ side, lines }) => Math.max(...lines.map(labelWidth)) <= room[side]) ?? options[0];
-}
-const LNGS = [70, 75, 80];
+const LNGS = [70, 75, 80, 85];
 
 export function TravelMap({
   trips,
@@ -72,11 +39,14 @@ export function TravelMap({
   onSelect: (id: string) => void;
 }) {
   const pins = trips.map((trip) => ({ trip, ...project(trip.coords) }));
+  const visited = ALSO_VISITED.map((place) => ({ place, ...project(place.coords) }));
+  const home = project(HOME.coords);
+  const now = project(NOW.coords);
 
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      className="h-auto w-full max-w-[340px] overflow-visible font-sans"
+      className="h-auto w-full max-w-[380px] overflow-visible font-sans"
       role="group"
       aria-label="Map of trips"
     >
@@ -112,21 +82,46 @@ export function TravelMap({
         );
       })}
 
+      {/* Been there, no story: small dots, named by the cursor label on hover. */}
+      {visited.map(({ place, x, y }) => (
+        <g key={place.name} data-marker="visited" data-cursor-text={place.name} aria-hidden>
+          <circle cx={x} cy={y} r={10} className="fill-transparent" />
+          <circle data-dot cx={x} cy={y} r={3.5} className="fill-brand/55" />
+        </g>
+      ))}
+
+      <g data-marker="home" data-cursor-text="Home · Ludhiana, Punjab">
+        <circle cx={home.x} cy={home.y} r={12} className="fill-transparent" />
+        <path
+          data-dot
+          d={`M ${home.x - 6} ${home.y + 5} V ${home.y - 1} L ${home.x} ${home.y - 6.5} L ${home.x + 6} ${home.y - 1} V ${home.y + 5} Z`}
+          className="fill-brand stroke-background"
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+        />
+      </g>
+
+      <g data-marker="now" data-cursor-text="Pune · working here now">
+        <circle cx={now.x} cy={now.y} r={12} className="fill-transparent" />
+        <circle
+          data-pulse
+          cx={now.x}
+          cy={now.y}
+          r={6}
+          className="origin-center fill-emerald-500/50 [transform-box:fill-box] motion-safe:animate-ping"
+        />
+        <circle data-dot cx={now.x} cy={now.y} r={5} className="fill-emerald-500 stroke-background" strokeWidth={2} />
+      </g>
+
       {pins.map(({ trip, x, y }) => {
         const active = trip.id === activeId;
-        // Put the label on the left when another pin sits close by on the right,
-        // so neighbouring labels don't run into each other.
-        const crowded = pins.some((o) => o.trip.id !== trip.id && Math.abs(o.y - y) < 30 && o.x > x);
-        const name = trip.location.split(",")[0];
-        const label = placeLabel(name, x, crowded);
-        const labelX = label.side === "left" ? x - LABEL_GAP : x + LABEL_GAP;
-
         return (
           <g
             key={trip.id}
             role="button"
             tabIndex={0}
             aria-label={`Open ${trip.title}`}
+            data-marker="trip"
             data-cursor-text={trip.title}
             onMouseEnter={() => onHover(trip.id)}
             onMouseLeave={() => onHover(null)}
@@ -156,6 +151,7 @@ export function TravelMap({
             {/* initial={false} renders the resting radius straight away; without it the
                 first paint has no `r` and the browser logs an invalid-attribute error. */}
             <motion.circle
+              data-dot
               cx={x}
               cy={y}
               initial={false}
@@ -164,24 +160,6 @@ export function TravelMap({
               className="fill-brand stroke-background"
               strokeWidth={2}
             />
-            <text
-              x={labelX}
-              y={y + 4}
-              textAnchor={label.side === "left" ? "end" : "start"}
-              className={cn(
-                "text-[12px] uppercase tracking-[0.12em] transition-colors",
-                active ? "fill-brand font-semibold" : "fill-foreground"
-              )}
-            >
-              {/* Two-line labels straddle the pin: first line up, second below. */}
-              {label.lines.length === 1
-                ? name
-                : label.lines.map((line, i) => (
-                    <tspan key={line} x={labelX} dy={i === 0 ? "-0.55em" : "1.1em"}>
-                      {line}
-                    </tspan>
-                  ))}
-            </text>
           </g>
         );
       })}
