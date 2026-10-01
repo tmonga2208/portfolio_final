@@ -107,6 +107,13 @@ function ThemedClickSpark({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Hover underline for the contact headline. A background rather than the global
+ * .link-underline (an inline-block), so the headline can wrap like normal text.
+ */
+const HEADLINE_UNDERLINE =
+  "bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_3px] bg-left-bottom bg-no-repeat box-decoration-clone transition-[background-size] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:bg-[length:100%_3px]";
+
 /** Copy the address instead of assuming a mail app; fall back to mailto if the clipboard is blocked. */
 async function handleContactClick(e: MouseEvent<HTMLAnchorElement>) {
   // Modified clicks (open in new tab, etc.) keep their normal behaviour.
@@ -285,12 +292,21 @@ export default function Home() {
                   href={`mailto:${EMAIL}`}
                   onClick={handleContactClick}
                   data-cursor-text="Click to copy my email"
-                  className="group inline-flex items-baseline transition-colors hover:text-brand"
+                  className="group transition-colors hover:text-brand"
                 >
-                  <span className="link-underline">Get in touch</span>
-                  <ArrowUpRight className="inline size-12 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:-translate-y-2 md:size-20" />
+                  <span className={HEADLINE_UNDERLINE}>Get in </span>
+                  {/* Keep the arrow on the same line as "touch". */}
+                  <span className="whitespace-nowrap">
+                    <span className={HEADLINE_UNDERLINE}>touch</span>
+                    <ArrowUpRight className="ml-1 inline size-12 align-baseline transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:-translate-y-2 md:size-20" />
+                  </span>
                 </Link>
-                <span className="italic text-brand">. Let&apos;s talk.</span>
+                {/* One line only fits from xl up; below that "Let's talk." gets its own
+                    line, without the dot that would otherwise start it. */}
+                <span className="italic text-brand">
+                  <span className="hidden xl:inline">. </span>
+                  <span className="block xl:inline">Let&apos;s talk.</span>
+                </span>
               </h2>
             </Magnetic>
           </Reveal>
@@ -312,7 +328,8 @@ export default function Home() {
             onClick={openCommandPalette}
             className="text-left uppercase tracking-[0.2em] transition-colors hover:text-brand md:text-right"
           >
-            Press ⌘K to explore
+            <span className="pointer-coarse:hidden">Press ⌘K to explore</span>
+            <span className="hidden pointer-coarse:inline">Tap to explore</span>
           </button>
         </footer>
       </main>

@@ -195,10 +195,16 @@ export function Hero() {
           initial="hidden"
           animate="show"
           aria-label="Tarun Monga"
-          className="flex w-full justify-between text-[15vw] font-bold leading-[0.85] tracking-tight text-brand md:text-[13vw]"
+          // The letters set to ~6.4em; the type is sized so they plus the 0.3em word
+          // gap always fit, rather than squeezing (and clipping) each letter.
+          className="flex w-full justify-between text-[12.5vw] font-bold leading-[0.85] tracking-tight text-brand md:text-[min(13vw,14rem)]"
         >
           {"TARUN MONGA".split("").map((char, i) => (
-            <span key={`${char}-${i}`} aria-hidden className="overflow-hidden py-[0.04em]">
+            <span
+              key={`${char}-${i}`}
+              aria-hidden
+              className={`shrink-0 overflow-hidden py-[0.04em] ${char === " " ? "w-[0.3em]" : ""}`}
+            >
               <motion.span variants={letter} className="block">
                 {char === " " ? " " : char}
               </motion.span>

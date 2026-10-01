@@ -22,6 +22,42 @@ const project = ({ lat, lng }: { lat: number; lng: number }) => ({
 });
 
 const LATS = [15, 20, 25, 30];
+
+/** Labels are 12px uppercase with wide tracking: about this many viewBox units a character. */
+const LABEL_CHAR_WIDTH = 8.6;
+const LABEL_GAP = 12;
+const labelWidth = (text: string) => text.length * LABEL_CHAR_WIDTH;
+
+/** Split a name at the space that best balances its two halves. */
+function splitInTwo(name: string): string[] {
+  const words = name.split(" ");
+  let best: string[] = [name];
+  let bestDiff = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(" ");
+    const b = words.slice(i).join(" ");
+    const diff = Math.abs(a.length - b.length);
+    if (diff < bestDiff) {
+      best = [a, b];
+      bestDiff = diff;
+    }
+  }
+  return best;
+}
+
+/**
+ * Where a pin's label goes: its preferred side on one line, else that side on
+ * two lines, else the other side — so no label runs off the edge of the map.
+ */
+function placeLabel(name: string, x: number, preferLeft: boolean) {
+  const room = { left: x - LABEL_GAP - 4, right: WIDTH - x - LABEL_GAP - 4 };
+  const sides = preferLeft ? (["left", "right"] as const) : (["right", "left"] as const);
+  const options = sides.flatMap((side) => [
+    { side, lines: [name] },
+    { side, lines: splitInTwo(name) },
+  ]);
+  return options.find(({ side, lines }) => Math.max(...lines.map(labelWidth)) <= room[side]) ?? options[0];
+}
 const LNGS = [70, 75, 80];
 
 export function TravelMap({
@@ -82,6 +118,8 @@ export function TravelMap({
         // so neighbouring labels don't run into each other.
         const crowded = pins.some((o) => o.trip.id !== trip.id && Math.abs(o.y - y) < 30 && o.x > x);
         const name = trip.location.split(",")[0];
+        const label = placeLabel(name, x, crowded);
+        const labelX = label.side === "left" ? x - LABEL_GAP : x + LABEL_GAP;
 
         return (
           <g
@@ -127,15 +165,22 @@ export function TravelMap({
               strokeWidth={2}
             />
             <text
-              x={crowded ? x - 12 : x + 12}
+              x={labelX}
               y={y + 4}
-              textAnchor={crowded ? "end" : "start"}
+              textAnchor={label.side === "left" ? "end" : "start"}
               className={cn(
                 "text-[12px] uppercase tracking-[0.12em] transition-colors",
                 active ? "fill-brand font-semibold" : "fill-foreground"
               )}
             >
-              {name}
+              {/* Two-line labels straddle the pin: first line up, second below. */}
+              {label.lines.length === 1
+                ? name
+                : label.lines.map((line, i) => (
+                    <tspan key={line} x={labelX} dy={i === 0 ? "-0.55em" : "1.1em"}>
+                      {line}
+                    </tspan>
+                  ))}
             </text>
           </g>
         );
