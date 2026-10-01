@@ -9,6 +9,8 @@ import { ScrollVelocity } from "@/components/ScrollVelocity";
 import { openCommandPalette } from "@/components/command-palette";
 import { TravelSection } from "@/components/travel-section";
 import { NowPlayingBadge } from "@/components/now-playing";
+import { Availability } from "@/components/availability";
+import { NameWordmark } from "@/components/name-wordmark";
 import { copyEmail, EMAIL } from "@/lib/contact";
 import { SiteNav } from "@/components/site-nav";
 import { Hero } from "@/components/hero";
@@ -244,7 +246,10 @@ export default function Home() {
             </Magnetic>
           </Reveal>
           <Reveal>
-            <p className="mt-10 font-sans text-sm text-muted-foreground">
+            <Availability />
+          </Reveal>
+          <Reveal>
+            <p className="mt-6 font-sans text-sm text-muted-foreground">
               {EMAIL} ·{" "}
               <a href={`mailto:${EMAIL}`} className="link-underline transition-colors hover:text-brand">
                 open in your mail app
@@ -253,17 +258,24 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <footer className="flex flex-col gap-4 border-t border-border px-6 py-10 text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row md:items-center md:justify-between md:px-10">
-          <span>© {new Date().getFullYear()} Tarun Monga</span>
-          <NowPlayingBadge />
-          <button
-            type="button"
-            onClick={openCommandPalette}
-            className="text-left uppercase tracking-[0.2em] transition-colors hover:text-brand md:text-right"
-          >
-            <span className="pointer-coarse:hidden">Press ⌘K to explore</span>
-            <span className="hidden pointer-coarse:inline">Tap to explore</span>
-          </button>
+        {/* The bottom padding keeps the last of the page clear of the player pill. */}
+        <footer className="border-t border-border px-6 pb-28 pt-10 md:px-10">
+          <div className="flex flex-col gap-4 text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row md:items-center md:justify-between">
+            <span>© {new Date().getFullYear()} Tarun Monga</span>
+            <NowPlayingBadge />
+            <button
+              type="button"
+              onClick={openCommandPalette}
+              className="text-left uppercase tracking-[0.2em] transition-colors hover:text-brand md:text-right"
+            >
+              <span className="pointer-coarse:hidden">Press ⌘K to explore</span>
+              <span className="hidden pointer-coarse:inline">Tap to explore</span>
+            </button>
+          </div>
+          {/* Bookends the hero. */}
+          <div className="mt-16 md:mt-24">
+            <NameWordmark placement="footer" />
+          </div>
         </footer>
       </main>
     </ThemedClickSpark>

@@ -7,22 +7,12 @@ import {
   useSpring,
   useTransform,
   type MotionValue,
-  type Variants,
 } from "framer-motion";
 import { useRef, type CSSProperties, type PointerEvent } from "react";
 import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion";
+import { NameWordmark } from "@/components/name-wordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-const wordmark: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } },
-};
-
-const letter: Variants = {
-  hidden: { y: "115%" },
-  show: { y: 0, transition: { duration: 0.9, ease: EASE } },
-};
 
 /**
  * The scattered composition from the WebGL gallery, rebuilt in DOM: a large centre
@@ -190,27 +180,7 @@ export function Hero() {
       <Gallery />
 
       <div className="relative z-10 mx-6 md:mx-10">
-        <motion.h1
-          variants={wordmark}
-          initial="hidden"
-          animate="show"
-          aria-label="Tarun Monga"
-          // The letters set to ~6.4em; the type is sized so they plus the 0.3em word
-          // gap always fit, rather than squeezing (and clipping) each letter.
-          className="flex w-full justify-between text-[12.5vw] font-bold leading-[0.85] tracking-tight text-brand md:text-[min(13vw,14rem)]"
-        >
-          {"TARUN MONGA".split("").map((char, i) => (
-            <span
-              key={`${char}-${i}`}
-              aria-hidden
-              className={`shrink-0 overflow-hidden py-[0.04em] ${char === " " ? "w-[0.3em]" : ""}`}
-            >
-              <motion.span variants={letter} className="block">
-                {char === " " ? " " : char}
-              </motion.span>
-            </span>
-          ))}
-        </motion.h1>
+        <NameWordmark placement="hero" />
 
         <motion.div
           initial={{ opacity: 0 }}
