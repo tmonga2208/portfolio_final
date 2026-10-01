@@ -9,6 +9,7 @@ import ClickSpark from "@/components/ClickSpark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { openCommandPalette } from "@/components/command-palette";
 import { TravelSection } from "@/components/travel-section";
+import { NowPlayingBadge } from "@/components/now-playing";
 import { copyEmail, EMAIL, GITHUB_URL, LINKEDIN_URL } from "@/lib/contact";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
@@ -282,7 +283,7 @@ export default function Home() {
 
         <footer className="flex flex-col gap-4 border-t border-border px-6 py-10 text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row md:items-center md:justify-between md:px-10">
           <span>© {new Date().getFullYear()} Tarun Monga</span>
-          <span>Built with Next.js &amp; Three.js</span>
+          <NowPlayingBadge />
           <button
             type="button"
             onClick={openCommandPalette}

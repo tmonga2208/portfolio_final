@@ -6,6 +6,11 @@
 @theme inline {
   --animate-marquee: marquee 25s linear infinite;
   --animate-marquee-reverse: marquee 25s linear infinite reverse;
+  --animate-equalizer: equalizer 0.9s ease-in-out infinite alternate;
+  @keyframes equalizer {
+    from { height: 25%; }
+    to { height: 100%; }
+  }
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
