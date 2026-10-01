@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "@/components/toast";
 import { EMAIL } from "@/lib/contact";
 
-const SECRET_WORD = "swim";
+const SPLASH = "🏊 Splash! Lap complete.";
 /** Phones can't type the secret, so tapping the word works too: this many taps, this fast. */
 const SWIM_TAPS = 5;
 const SWIM_TAP_WINDOW_MS = 2500;
@@ -27,7 +27,26 @@ const KONAMI = [
   "b", "a",
 ];
 
-type Effect = { id: number; kind: "ripple" | "bubbles" };
+type Effect = { id: number; kind: "ripple" | "bubbles" | "waves" };
+
+/** Words that do something when typed anywhere on the page. */
+const SECRET_WORDS: { word: string; kind: Effect["kind"]; message: string }[] = [
+  { word: "swim", kind: "ripple", message: SPLASH },
+  // The library is mostly Rick Riordan; Annabeth's name for Percy.
+  { word: "percy", kind: "waves", message: "🔱 Seaweed Brain detected. The sea approves." },
+];
+const LONGEST_WORD = Math.max(...SECRET_WORDS.map(({ word }) => word.length));
+
+/** Three layers of sea, back to front: taller and fainter behind, quicker in front. */
+const WAVE_LAYERS = [
+  { height: "38vh", opacity: 0.18, duration: 7 },
+  { height: "30vh", opacity: 0.28, duration: 5 },
+  { height: "22vh", opacity: 0.45, duration: 3.6 },
+];
+// Sixteen wavelengths across a strip twice the screen wide, so sliding it by
+// half a strip loops seamlessly.
+const WAVE_PATH =
+  "M0 40 " + Array.from({ length: 16 }, (_, i) => `${i === 0 ? "Q 90 0 180 40" : `T ${180 * (i + 1)} 40`}`).join(" ") + " V 400 H 0 Z";
 
 /** Deterministic per-bubble variety, so renders don't reshuffle mid-animation. */
 const BUBBLES = Array.from({ length: 28 }, (_, i) => ({
@@ -41,7 +60,7 @@ const BUBBLES = Array.from({ length: 28 }, (_, i) => ({
 /**
  * Small secrets, mostly hinted at by the "swim" in the About section:
  * - typing "swim" anywhere (or tapping the word five times) sends ripples
- *   across the screen;
+ *   across the screen, and typing "percy" raises the sea;
  * - the Konami code sends a column of bubbles up the page;
  * - the console greets anyone who opens DevTools;
  * - the tab title calls you back while you're on another tab.
@@ -74,10 +93,11 @@ export function EasterEggs() {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
 
       if (key.length === 1) {
-        typed = (typed + key).slice(-SECRET_WORD.length);
-        if (typed === SECRET_WORD) {
+        typed = (typed + key).slice(-LONGEST_WORD);
+        const secret = SECRET_WORDS.find(({ word }) => typed.endsWith(word));
+        if (secret) {
           typed = "";
-          trigger("ripple", "🏊 Splash! Lap complete.");
+          trigger(secret.kind, secret.message);
         }
       }
 
@@ -88,7 +108,7 @@ export function EasterEggs() {
       }
     };
 
-    const onSwimTaps = () => trigger("ripple", "🏊 Splash! Lap complete.");
+    const onSwimTaps = () => trigger("ripple", SPLASH);
 
     let titleBeforeAway: string | null = null;
     const onVisibility = () => {
@@ -134,6 +154,30 @@ export function EasterEggs() {
                   transition={{ duration: 2.2, delay, ease: [0.22, 1, 0.36, 1] }}
                   className="absolute left-1/2 top-1/2 -ml-[75vmax] -mt-[75vmax] size-[150vmax] rounded-full border-[6px] border-brand"
                 />
+              ))}
+            </motion.div>
+          ) : effect.kind === "waves" ? (
+            <motion.div
+              key={effect.id}
+              data-waves
+              initial={{ y: "100%" }}
+              animate={{ y: "0%" }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-x-0 bottom-0 h-[40vh]"
+            >
+              {WAVE_LAYERS.map((layer) => (
+                <motion.svg
+                  key={layer.height}
+                  viewBox="0 0 2880 400"
+                  preserveAspectRatio="none"
+                  animate={{ x: ["0%", "-50%"] }}
+                  transition={{ duration: layer.duration, repeat: Infinity, ease: "linear" }}
+                  className="absolute bottom-0 left-0 w-[200%] fill-brand"
+                  style={{ height: layer.height, opacity: layer.opacity }}
+                >
+                  <path d={WAVE_PATH} />
+                </motion.svg>
               ))}
             </motion.div>
           ) : (

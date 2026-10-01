@@ -31,6 +31,8 @@ const SCOPES = [
     'user-modify-playback-state',
     'playlist-read-private',
     'playlist-read-collaborative',
+    // "On repeat" on the home page reads the account's most-played tracks.
+    'user-top-read',
 ].join(' ');
 
 const code = process.argv[2];

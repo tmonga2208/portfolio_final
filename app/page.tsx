@@ -12,6 +12,8 @@ import { NowPlayingBadge } from "@/components/now-playing";
 import { Availability } from "@/components/availability";
 import { NameWordmark } from "@/components/name-wordmark";
 import { SwimWord } from "@/components/easter-eggs";
+import { NowNote } from "@/components/now-note";
+import { OnRepeat } from "@/components/on-repeat";
 import { copyEmail, EMAIL } from "@/lib/contact";
 import { SiteNav } from "@/components/site-nav";
 import { Hero } from "@/components/hero";
@@ -152,6 +154,10 @@ export default function Home() {
               </RevealItem>
             </RevealGroup>
           </div>
+          <Reveal>
+            <NowNote />
+            <OnRepeat />
+          </Reveal>
         </section>
 
         {/* 02 — Experience */}
