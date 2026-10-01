@@ -11,6 +11,7 @@ import { TravelSection } from "@/components/travel-section";
 import { NowPlayingBadge } from "@/components/now-playing";
 import { Availability } from "@/components/availability";
 import { NameWordmark } from "@/components/name-wordmark";
+import { SwimWord } from "@/components/easter-eggs";
 import { copyEmail, EMAIL } from "@/lib/contact";
 import { SiteNav } from "@/components/site-nav";
 import { Hero } from "@/components/hero";
@@ -141,7 +142,7 @@ export default function Home() {
               <RevealItem>
                 <p>
                   Outside of code I{" "}
-                  <span className="font-semibold italic text-brand" data-cursor-text="psst — type it">swim</span> to clear my head,
+                  <SwimWord /> to clear my head,
                   and I try to read. Sometimes it works. Sometimes I just buy more{" "}
                   <Link href="/library" className="link-underline font-semibold italic text-brand">
                     books

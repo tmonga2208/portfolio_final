@@ -9,6 +9,9 @@ const clock = new Intl.DateTimeFormat("en-IN", {
   hour12: true,
 });
 
+/** Midnight to 6am, read off the formatted time (e.g. "2:30 am"). */
+const isSmallHours = (time: string) => /am/i.test(time) && Number(time.split(":")[0]) % 12 < 6;
+
 const subscribeToClock = (onTick: () => void) => {
   const id = setInterval(onTick, 15_000);
   return () => clearInterval(id);
@@ -32,6 +35,7 @@ export function Availability() {
       {time && (
         <span className="text-muted-foreground">
           <time>{time}</time> in Gurugram
+          {isSmallHours(time) && " · probably asleep — I'll reply in the morning"}
         </span>
       )}
     </div>
