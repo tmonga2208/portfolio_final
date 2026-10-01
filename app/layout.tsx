@@ -8,6 +8,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { CursorLabel } from "@/components/cursor-label";
 import { EasterEggs } from "@/components/easter-eggs";
 import { Toaster } from "@/components/toast";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,8 @@ export default function RootLayout({
           <Toaster />
           {children}
         </ThemeProvider>
+        {/* Page views for Vercel Web Analytics (enabled per project in the dashboard). */}
+        <Analytics />
       </body>
     </html>
   );
