@@ -175,12 +175,18 @@ export default function Home() {
           </Reveal>
         </section>
 
-        {/* Scroll faster and the band speeds up with you. */}
+        {/* Scroll faster and the band speeds up with you. Two single-row bands so the
+            second, running the other way, can be outlined in the accent colour. */}
         <div aria-hidden className="select-none pt-24 text-foreground/90 md:pt-32">
           <ScrollVelocity
-            texts={["Frontend · Design Systems · Interfaces ·", "React · TypeScript · Next.js · Figma ·"]}
+            texts={["Frontend · Design Systems · Interfaces ·"]}
             velocity={40}
             className="px-4 font-crimson italic"
+          />
+          <ScrollVelocity
+            texts={["React · TypeScript · Next.js · Figma ·"]}
+            velocity={-40}
+            className="px-4 font-crimson italic text-transparent [-webkit-text-stroke:1px_var(--brand)] md:[-webkit-text-stroke:1.5px_var(--brand)]"
           />
         </div>
 
