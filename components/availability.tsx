@@ -27,7 +27,7 @@ export function Availability() {
           <span className="absolute inline-flex size-full rounded-full bg-emerald-500 opacity-60 motion-safe:animate-ping" />
           <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
         </span>
-        Open to full-time roles
+        Open to new opportunities
       </span>
       {time && (
         <span className="text-muted-foreground">

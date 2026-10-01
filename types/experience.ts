@@ -8,7 +8,12 @@ export interface Experience {
      * says it twice. Needs a transparent background.
      */
     logo?: { src: string; width: number; height: number };
-    role: string;
+    /**
+     * Roles held there, newest first. More than one shows a progression (e.g.
+     * intern to full-time) under a single company entry.
+     */
+    roles: { title: string; period: string }[];
+    /** The whole time at the company, across all its roles. */
     period: string;
     location?: string;
     /** One or two sentences of context: what the team was, what you owned. */
@@ -22,8 +27,11 @@ export const experienceData: Experience[] = [
     {
         company: "IoT83",
         logo: { src: "/logos/iot83.png", width: 1197, height: 490 },
-        role: "Software Engineer Intern",
         period: "February 2026 — Present",
+        roles: [
+            { title: "Software Engineer", period: "August 2026 — Present" },
+            { title: "Software Engineer Intern", period: "February 2026 — August 2026" },
+        ],
         location: "Gurugram, India",
         blurb:
             "Building internal platform tooling — the identity and access layer the rest of the organization runs on, across both the React front end and the services behind it.",
