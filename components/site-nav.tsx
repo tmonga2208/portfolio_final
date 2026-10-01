@@ -3,6 +3,7 @@
 import { Command, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import FlowingMenu from "@/components/FlowingMenu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,10 +15,39 @@ type NavItem = { label: string } & ({ section: string } | { href: string });
 const NAV_ITEMS: NavItem[] = [
   { label: "Experience", section: "experience" },
   { label: "Work", section: "work" },
+  { label: "Projects", section: "projects" },
   { label: "Stack", section: "stack" },
+  { label: "Travel", section: "travel" },
   { label: "Library", href: "/library" },
   { label: "Contact", section: "contact" },
 ];
+
+/** Every home-page section in order, including ones the bar doesn't list. */
+const SECTIONS = ["about", "experience", "work", "projects", "stack", "travel", "gallery", "contact"];
+
+const subscribeToScroll = (onChange: () => void) => {
+  window.addEventListener("scroll", onChange, { passive: true });
+  window.addEventListener("resize", onChange);
+  return () => {
+    window.removeEventListener("scroll", onChange);
+    window.removeEventListener("resize", onChange);
+  };
+};
+
+/**
+ * The section being read: the last one whose top has passed a line a third of
+ * the way down the screen. Null above the first section (the hero) and on
+ * pages without sections.
+ */
+function sectionInView(): string | null {
+  const line = window.innerHeight * 0.35;
+  let current: string | null = null;
+  for (const id of SECTIONS) {
+    const top = document.getElementById(id)?.getBoundingClientRect().top;
+    if (top !== undefined && top <= line) current = id;
+  }
+  return current;
+}
 
 const MENU_ITEMS: (NavItem & { image: string })[] = [
   { label: "About", section: "about", image: "/img5.jpeg" },
@@ -33,9 +63,14 @@ const MENU_ITEMS: (NavItem & { image: string })[] = [
 /** The site header, shared by the home page and the library. */
 export function SiteNav() {
   const pathname = usePathname();
+  const activeSection = useSyncExternalStore(subscribeToScroll, sectionInView, () => null);
   // Sections are plain hashes on the home page; from anywhere else they route home first.
   const hrefFor = (item: NavItem) =>
     "href" in item ? item.href : pathname === "/" ? `#${item.section}` : `/#${item.section}`;
+  const currentFor = (item: NavItem) =>
+    "href" in item
+      ? pathname === item.href && ("page" as const)
+      : pathname === "/" && activeSection === item.section && ("location" as const);
 
   return (
     <motion.header
@@ -49,12 +84,30 @@ export function SiteNav() {
           Tarun <span className="text-brand">Monga</span>
         </Link>
 
-        <nav className="hidden gap-8 text-sm uppercase tracking-[0.15em] md:flex">
-          {NAV_ITEMS.map((item) => (
-            <Link key={item.label} href={hrefFor(item)} className="link-underline transition-colors hover:text-brand">
-              {item.label}
-            </Link>
-          ))}
+        {/* Seven items only fit from lg up (tighter until xl); smaller screens use the menu. */}
+        <nav className="hidden gap-5 text-sm uppercase tracking-[0.1em] lg:flex xl:gap-8 xl:tracking-[0.15em]">
+          {NAV_ITEMS.map((item) => {
+            const current = currentFor(item);
+            return (
+              <Link
+                key={item.label}
+                href={hrefFor(item)}
+                aria-current={current || undefined}
+                className={`link-underline transition-colors hover:text-brand ${current ? "text-brand" : ""}`}
+              >
+                {item.label}
+                {/* Slides from item to item as you scroll. */}
+                {current && (
+                  <motion.span
+                    layoutId="nav-marker"
+                    aria-hidden
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    className="absolute -bottom-2.5 left-1/2 size-1 -translate-x-1/2 rounded-full bg-brand"
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-4">
@@ -85,7 +138,7 @@ export function SiteNav() {
           ))}
           <FlowingMenu
             items={MENU_ITEMS.map((item) => ({ link: hrefFor(item), text: item.label, image: item.image }))}
-            className="md:hidden"
+            className="lg:hidden"
           />
         </div>
       </div>
