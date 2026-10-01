@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import type { MouseEvent, ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import FlowingMenu from "@/components/FlowingMenu";
+import { ScrollVelocity } from "@/components/ScrollVelocity";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { openCommandPalette } from "@/components/command-palette";
 import { TravelSection } from "@/components/travel-section";
@@ -231,6 +232,15 @@ export default function Home() {
             <ShowcaseList entries={PROJECTS} variant="project" />
           </Reveal>
         </section>
+
+        {/* Scroll faster and the band speeds up with you. */}
+        <div aria-hidden className="select-none pt-24 text-foreground/90 md:pt-32">
+          <ScrollVelocity
+            texts={["Frontend · Design Systems · Interfaces ·", "React · TypeScript · Next.js · Figma ·"]}
+            velocity={40}
+            className="px-4 font-crimson italic"
+          />
+        </div>
 
         {/* 05 — Stack */}
         <section id="stack" className="scroll-mt-24 px-6 py-24 md:px-10 md:py-32">
