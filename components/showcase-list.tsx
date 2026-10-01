@@ -140,6 +140,13 @@ export function ShowcaseList({
                 {entry.title}
               </h3>
 
+              {/* Touch screens get no hover preview, so show the first screenshot inline.
+                  Picked by a CSS media query, not canHover, so desktop never flashes it
+                  while hydrating. */}
+              <span className="relative hidden aspect-video w-16 shrink-0 overflow-hidden rounded-md border border-border pointer-coarse:block">
+                <Image src={entry.images[0].src} alt="" fill sizes="64px" className="object-cover" />
+              </span>
+
               <span className="hidden shrink-0 text-sm text-muted-foreground md:block">
                 {entry.period}
               </span>
