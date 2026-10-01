@@ -4,7 +4,9 @@ import "./globals.css";
 import { Player } from "@/components/player";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CommandPalette } from "@/components/command-palette";
 import { CursorLabel } from "@/components/cursor-label";
+import { Toaster } from "@/components/toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +46,8 @@ export default function RootLayout({
           <ScrollProgress />
           <Player />
           <CursorLabel />
+          <CommandPalette />
+          <Toaster />
           {children}
         </ThemeProvider>
       </body>

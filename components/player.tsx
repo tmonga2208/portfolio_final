@@ -39,6 +39,7 @@ declare global {
 
 const PLAYLIST_ID = process.env.NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID || "5zm54nM2Y2gEGS3VeWF3vY";
 const HIDDEN_KEY = "player:hidden";
+export const PLAYER_TOGGLE_EVENT = "player:toggle";
 const VOLUME_KEY = "player:volume";
 
 // Rewinding past this point in a track restarts it instead of stepping back,
@@ -434,6 +435,29 @@ export function Player() {
             // Ignore storage failures.
         }
     };
+
+    // Lets the command palette drive the player without reaching into its state.
+    // Inside the browser player it toggles playback; before anything has played
+    // it starts the playlist; and if the browser can't play Spotify at all, it
+    // brings the player into view with the queue open instead.
+    const handleExternalToggle = useRef<() => void>(() => {});
+    useEffect(() => {
+        handleExternalToggle.current = () => {
+            if (mode === "sdk") {
+                togglePlay();
+            } else if (isPlayerReady) {
+                playTrack(undefined, `spotify:playlist:${PLAYLIST_ID}`);
+            } else {
+                showPlayer();
+                setShowQueue(true);
+            }
+        };
+    });
+    useEffect(() => {
+        const onToggle = () => handleExternalToggle.current();
+        window.addEventListener(PLAYER_TOGGLE_EVENT, onToggle);
+        return () => window.removeEventListener(PLAYER_TOGGLE_EVENT, onToggle);
+    }, []);
 
     const isPlaying = mode === "sdk" ? !isPaused : mode === "remote" ? Boolean(nowPlaying?.isPlaying) : false;
 

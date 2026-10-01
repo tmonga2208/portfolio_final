@@ -1,14 +1,16 @@
 "use client";
 
-import { ArrowUpRight, Github, Linkedin } from "lucide-react";
+import { ArrowUpRight, Command, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import { TravelPolaroid } from "@/components/travel-polaroid";
 import { blogData } from "@/types/blog";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { openCommandPalette } from "@/components/command-palette";
+import { copyEmail, EMAIL, GITHUB_URL, LINKEDIN_URL } from "@/lib/contact";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
@@ -92,6 +94,14 @@ function ThemedClickSpark({ children }: { children: ReactNode }) {
   );
 }
 
+/** Copy the address instead of assuming a mail app; fall back to mailto if the clipboard is blocked. */
+async function handleContactClick(e: MouseEvent<HTMLAnchorElement>) {
+  // Modified clicks (open in new tab, etc.) keep their normal behaviour.
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  if (!(await copyEmail())) window.location.href = `mailto:${EMAIL}`;
+}
+
 function Nav() {
   return (
     <motion.header
@@ -114,10 +124,19 @@ function Nav() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Open command palette"
+            data-cursor-text="Search everything"
+            className="hidden items-center gap-1.5 rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground transition-colors hover:border-brand hover:text-brand md:flex"
+          >
+            <Command className="size-3.5" />K
+          </button>
           <ThemeToggle />
           {[
-            { href: "https://github.com/tmonga2208", Icon: Github, label: "GitHub" },
-            { href: "https://www.linkedin.com/in/tarun-monga-b00008181/", Icon: Linkedin, label: "LinkedIn" },
+            { href: GITHUB_URL, Icon: Github, label: "GitHub" },
+            { href: LINKEDIN_URL, Icon: Linkedin, label: "LinkedIn" },
           ].map(({ href, Icon, label }) => (
             <motion.div
               key={label}
@@ -145,7 +164,7 @@ export default function Home() {
         <Hero />
 
         {/* 01 — About */}
-        <section className="px-6 py-24 md:px-10 md:py-32">
+        <section id="about" className="scroll-mt-24 px-6 py-24 md:px-10 md:py-32">
           <SectionHeading index="01 / About">About</SectionHeading>
           <div className="mt-14 grid gap-12 md:grid-cols-[1fr_1fr]">
             <Reveal>
@@ -193,7 +212,7 @@ export default function Home() {
         </section>
 
         {/* 04 — Projects */}
-        <section className="px-6 pt-24 md:px-10 md:pt-32">
+        <section id="projects" className="scroll-mt-24 px-6 pt-24 md:px-10 md:pt-32">
           <SectionHeading index="04 / Things I Built">Projects</SectionHeading>
           <Reveal className="mt-12">
             <ShowcaseList entries={PROJECTS} variant="project" />
@@ -209,7 +228,7 @@ export default function Home() {
         </section>
 
         {/* 06 — Beyond the code */}
-        <section className="px-6 pb-24 md:px-10 md:pb-32">
+        <section id="travel" className="scroll-mt-24 px-6 pb-24 md:px-10 md:pb-32">
           <SectionHeading index="06 / Beyond the Code">Travel</SectionHeading>
           <Reveal>
             <p className="mt-14 max-w-2xl text-2xl leading-snug text-muted-foreground">
@@ -247,8 +266,9 @@ export default function Home() {
             <Magnetic strength={0.15}>
               <h2 className="text-6xl font-bold leading-[0.95] md:text-8xl">
                 <Link
-                  href="mailto:tarunmonga2208@gmail.com"
-                  data-cursor-text="Say hello"
+                  href={`mailto:${EMAIL}`}
+                  onClick={handleContactClick}
+                  data-cursor-text="Click to copy my email"
                   className="group inline-flex items-baseline transition-colors hover:text-brand"
                 >
                   <span className="link-underline">Get in touch</span>
@@ -258,11 +278,26 @@ export default function Home() {
               </h2>
             </Magnetic>
           </Reveal>
+          <Reveal>
+            <p className="mt-10 font-sans text-sm text-muted-foreground">
+              {EMAIL} ·{" "}
+              <a href={`mailto:${EMAIL}`} className="link-underline transition-colors hover:text-brand">
+                open in your mail app
+              </a>
+            </p>
+          </Reveal>
         </section>
 
         <footer className="flex flex-col gap-4 border-t border-border px-6 py-10 text-xs uppercase tracking-[0.2em] text-muted-foreground md:flex-row md:items-center md:justify-between md:px-10">
           <span>© {new Date().getFullYear()} Tarun Monga</span>
           <span>Built with Next.js &amp; Three.js</span>
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            className="text-left uppercase tracking-[0.2em] transition-colors hover:text-brand md:text-right"
+          >
+            Press ⌘K to explore
+          </button>
         </footer>
       </main>
     </ThemedClickSpark>
