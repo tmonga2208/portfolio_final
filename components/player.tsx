@@ -1,6 +1,7 @@
 "use client"
 import { ArrowUpRight, AudioLines, ListMusic, Music, Pause, Play, SkipBack, SkipForward, Volume1, Volume2, VolumeX, X } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Script from "next/script";
 
@@ -91,6 +92,8 @@ export function Player() {
     const [playlist, setPlaylist] = useState<PlaylistData | null>(null);
     const [showQueue, setShowQueue] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
+    // The player rests as a small pill; hovering (or tapping) opens the full card.
+    const [expanded, setExpanded] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const [player, setPlayer] = useState<Spotify.Player | null>(null);
@@ -323,15 +326,19 @@ export function Player() {
         }
     }, [volume, player, mounted]);
 
-    // Close the queue on Escape or an outside click.
+    // Fold back into the pill (closing the queue too) on Escape or an outside click.
     useEffect(() => {
-        if (!showQueue) return;
+        if (!expanded) return;
 
+        const collapse = () => {
+            setExpanded(false);
+            setShowQueue(false);
+        };
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") setShowQueue(false);
+            if (e.key === "Escape") collapse();
         };
         const onPointerDown = (e: PointerEvent) => {
-            if (!containerRef.current?.contains(e.target as Node)) setShowQueue(false);
+            if (!containerRef.current?.contains(e.target as Node)) collapse();
         };
 
         document.addEventListener("keydown", onKeyDown);
@@ -340,7 +347,7 @@ export function Player() {
             document.removeEventListener("keydown", onKeyDown);
             document.removeEventListener("pointerdown", onPointerDown);
         };
-    }, [showQueue]);
+    }, [expanded]);
 
     const playTrack = async (trackUri?: string, playlistUri?: string) => {
         if (!deviceId) return;
@@ -419,6 +426,7 @@ export function Player() {
 
     const hidePlayer = () => {
         setIsVisible(false);
+        setExpanded(false);
         setShowQueue(false);
         try {
             localStorage.setItem(HIDDEN_KEY, "1");
@@ -449,6 +457,7 @@ export function Player() {
                 playTrack(undefined, `spotify:playlist:${PLAYLIST_ID}`);
             } else {
                 showPlayer();
+                setExpanded(true);
                 setShowQueue(true);
             }
         };
@@ -489,281 +498,351 @@ export function Player() {
             {isVisible && (
                 <div
                     ref={containerRef}
-                    className="z-100 w-full max-w-lg px-3 sm:px-0 mx-auto font-sans fixed bottom-4 left-1/2 -translate-x-1/2 group"
+                    role="region"
+                    aria-label="Music player"
+                    // Mice open the card on hover; touch screens open it with a tap on the pill.
+                    onPointerEnter={(e) => {
+                        if (e.pointerType === "mouse") setExpanded(true);
+                    }}
+                    onPointerLeave={(e) => {
+                        if (e.pointerType !== "mouse") return;
+                        setExpanded(false);
+                        setShowQueue(false);
+                    }}
+                    className="fixed bottom-4 right-4 z-100 font-sans"
                 >
-                    <div
-                        className={`relative z-20 bg-[#121212] text-white p-3 rounded-2xl shadow-2xl border border-white/5 transition-all duration-300 ${showQueue ? "rounded-b-none" : ""}`}
-                    >
-                        <button
-                            onClick={hidePlayer}
-                            aria-label="Hide player"
-                            className="absolute -top-3 left-0 bg-[#121212] text-white/70 hover:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all duration-300 shadow-lg border border-white/10 z-50 hover:bg-white/10 hover:scale-110"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
+                    <AnimatePresence mode="wait" initial={false}>
+                        {expanded ? (
+                            <motion.div
+                                key="card"
+                                initial={{ opacity: 0, scale: 0.92 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.96 }}
+                                transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                                style={{ transformOrigin: "bottom right" }}
+                                className="group w-[calc(100vw-2rem)] max-w-lg"
+                            >
+                                <div
+                                    className={`relative z-20 bg-[#121212] text-white p-3 rounded-2xl shadow-2xl border border-white/5 transition-all duration-300 ${showQueue ? "rounded-b-none" : ""}`}
+                                >
+                                    <button
+                                        onClick={hidePlayer}
+                                        aria-label="Hide player"
+                                        className="absolute -top-3 left-0 bg-[#121212] text-white/70 hover:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100 transition-all duration-300 shadow-lg border border-white/10 z-50 hover:bg-white/10 hover:scale-110"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
 
-                        <div className="flex items-center gap-4">
-                            {/* Album art, or an empty frame when Spotify has nothing to show */}
-                            <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden bg-white/10">
-                                {displayTrack?.imgurl ? (
-                                    <>
-                                        <Image
-                                            src={displayTrack.imgurl}
-                                            alt={displayTrack.name}
-                                            fill
-                                            sizes="56px"
-                                            className="object-cover"
-                                        />
-                                        {isPlaying && (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                                <AudioLines className="w-5 h-5 text-green-500 motion-safe:animate-pulse" />
+                                    <div className="flex items-center gap-4">
+                                        {/* Album art, or an empty frame when Spotify has nothing to show */}
+                                        <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden bg-white/10">
+                                            {displayTrack?.imgurl ? (
+                                                <>
+                                                    <Image
+                                                        src={displayTrack.imgurl}
+                                                        alt={displayTrack.name}
+                                                        fill
+                                                        sizes="56px"
+                                                        className="object-cover"
+                                                    />
+                                                    {isPlaying && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                            <AudioLines className="w-5 h-5 text-green-500 motion-safe:animate-pulse" />
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center">
+                                                    <Music className="w-5 h-5 text-white/25" />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Track info, or the idle placeholder */}
+                                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5 text-left">
+                                            {displayTrack ? (
+                                                <>
+                                                    <p
+                                                        className={`text-[10px] uppercase tracking-widest font-medium truncate ${isPlaying ? "text-green-500" : "text-white/40"}`}
+                                                    >
+                                                        {isPlaying ? `🎧 Playing on ${displayTrack.device}` : "Paused"}
+                                                    </p>
+                                                    <h3 className="font-bold text-base tracking-tight truncate leading-none mb-1">
+                                                        {displayTrack.name}
+                                                    </h3>
+                                                    <p className="text-xs font-medium text-white/50 uppercase tracking-wider truncate">
+                                                        {displayTrack.artist}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className="text-[10px] uppercase tracking-widest text-white/30 font-medium">
+                                                        Spotify
+                                                    </p>
+                                                    <h3 className="font-bold text-base tracking-tight truncate leading-none mb-1 text-white/70">
+                                                        Nothing playing
+                                                    </h3>
+                                                    <p className="text-xs font-medium text-white/40 uppercase tracking-wider truncate">
+                                                        Browse the playlist
+                                                    </p>
+                                                </>
+                                            )}
+                                        </div>
+
+                                        {/* Transport — only ours to drive when the SDK owns playback */}
+                                        {isPlayerReady && mode === "sdk" && (
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={skipPrev}
+                                                    aria-label="Previous track"
+                                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                                >
+                                                    <SkipBack className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={togglePlay}
+                                                    aria-label={isPaused ? "Play" : "Pause"}
+                                                    className="p-2 rounded-full bg-white text-black hover:scale-105 transition-transform"
+                                                >
+                                                    {isPaused ? <Play className="w-4 h-4 ml-0.5" /> : <Pause className="w-4 h-4" />}
+                                                </button>
+                                                <button
+                                                    onClick={skipNext}
+                                                    aria-label="Next track"
+                                                    className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                                >
+                                                    <SkipForward className="w-4 h-4" />
+                                                </button>
                                             </div>
                                         )}
-                                    </>
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center">
-                                        <Music className="w-5 h-5 text-white/25" />
-                                    </div>
-                                )}
-                            </div>
 
-                            {/* Track info, or the idle placeholder */}
-                            <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5 text-left">
-                                {displayTrack ? (
-                                    <>
-                                        <p
-                                            className={`text-[10px] uppercase tracking-widest font-medium truncate ${isPlaying ? "text-green-500" : "text-white/40"}`}
-                                        >
-                                            {isPlaying ? `🎧 Playing on ${displayTrack.device}` : "Paused"}
-                                        </p>
-                                        <h3 className="font-bold text-base tracking-tight truncate leading-none mb-1">
-                                            {displayTrack.name}
-                                        </h3>
-                                        <p className="text-xs font-medium text-white/50 uppercase tracking-wider truncate">
-                                            {displayTrack.artist}
-                                        </p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="text-[10px] uppercase tracking-widest text-white/30 font-medium">
-                                            Spotify
-                                        </p>
-                                        <h3 className="font-bold text-base tracking-tight truncate leading-none mb-1 text-white/70">
-                                            Nothing playing
-                                        </h3>
-                                        <p className="text-xs font-medium text-white/40 uppercase tracking-wider truncate">
-                                            Browse the playlist
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Transport — only ours to drive when the SDK owns playback */}
-                            {isPlayerReady && mode === "sdk" && (
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={skipPrev}
-                                        aria-label="Previous track"
-                                        className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                    >
-                                        <SkipBack className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={togglePlay}
-                                        aria-label={isPaused ? "Play" : "Pause"}
-                                        className="p-2 rounded-full bg-white text-black hover:scale-105 transition-transform"
-                                    >
-                                        {isPaused ? <Play className="w-4 h-4 ml-0.5" /> : <Pause className="w-4 h-4" />}
-                                    </button>
-                                    <button
-                                        onClick={skipNext}
-                                        aria-label="Next track"
-                                        className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                                    >
-                                        <SkipForward className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* Volume only affects the in-browser player */}
-                            {mode === "sdk" && (
-                                <div className="hidden sm:flex items-center gap-1.5 group/vol">
-                                    <button
-                                        onClick={toggleMute}
-                                        aria-label={isMuted ? "Unmute" : "Mute"}
-                                        className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                                    >
-                                        <VolumeIcon className="w-4 h-4" />
-                                    </button>
-                                    <div className="relative h-1 w-0 group-hover/vol:w-16 focus-within:w-16 transition-[width] duration-300 rounded-full bg-white/15 overflow-hidden group-hover/vol:overflow-visible">
-                                        <div
-                                            className="absolute inset-y-0 left-0 rounded-full bg-white/70"
-                                            style={{ width: `${volume * 100}%` }}
-                                        />
-                                        <input
-                                            type="range"
-                                            min={0}
-                                            max={1}
-                                            step={0.01}
-                                            value={volume}
-                                            onChange={(e) => setVolume(Number(e.target.value))}
-                                            aria-label="Volume"
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <button
-                                onClick={() => setShowQueue(!showQueue)}
-                                aria-label="Toggle queue"
-                                aria-expanded={showQueue}
-                                className={`p-2 rounded-lg transition-colors hover:bg-white/10 ${showQueue ? "bg-white/10 text-white" : "text-white/40"}`}
-                            >
-                                <ListMusic className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        {/* Seek bar — revealed on hover, and only when there's a track to seek
-                            through. The 0fr/1fr grid row is what lets the collapse animate;
-                            touch devices have no hover, so it stays open there. */}
-                        {displayTrack && (
-                            <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 group-hover:grid-rows-[1fr] group-hover:opacity-100 focus-within:grid-rows-[1fr] focus-within:opacity-100 pointer-coarse:grid-rows-[1fr] pointer-coarse:opacity-100">
-                                <div className="overflow-hidden">
-                                    <div className="flex items-center gap-2 mt-2.5 px-0.5">
-                                        <span className="text-[10px] tabular-nums text-white/40 w-8 text-right shrink-0">
-                                            {formatTime(displayMs)}
-                                        </span>
-                                        <div className="relative h-1 flex-1 rounded-full bg-white/15 group/seek">
-                                            <div
-                                                className="absolute inset-y-0 left-0 rounded-full bg-green-500"
-                                                style={{ width: `${progressPercent}%` }}
-                                            />
-                                            {canSeek && (
-                                                <div
-                                                    className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow opacity-0 group-hover/seek:opacity-100 group-focus-within/seek:opacity-100 transition-opacity"
-                                                    style={{ left: `${progressPercent}%` }}
-                                                />
-                                            )}
-                                            <input
-                                                type="range"
-                                                min={0}
-                                                max={durationMs || 1}
-                                                step={1000}
-                                                value={displayMs}
-                                                disabled={!canSeek}
-                                                aria-label="Seek"
-                                                aria-valuetext={`${formatTime(displayMs)} of ${formatTime(durationMs)}`}
-                                                onPointerDown={() => {
-                                                    isScrubbingRef.current = true;
-                                                }}
-                                                onChange={(e) => {
-                                                    const value = Number(e.target.value);
-                                                    // Keyboard input never fires pointerdown, so commit it right away.
-                                                    if (isScrubbingRef.current) setScrubMs(value);
-                                                    else commitSeek(value);
-                                                }}
-                                                onPointerUp={() => {
-                                                    isScrubbingRef.current = false;
-                                                    if (scrubMs !== null) commitSeek(scrubMs);
-                                                    setScrubMs(null);
-                                                }}
-                                                onPointerCancel={() => {
-                                                    isScrubbingRef.current = false;
-                                                    setScrubMs(null);
-                                                }}
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-default"
-                                            />
-                                        </div>
-                                        <span className="text-[10px] tabular-nums text-white/40 w-8 shrink-0">
-                                            {formatTime(durationMs)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Queue / Playlist Dropdown */}
-                    <div
-                        className={`overflow-hidden transition-all duration-300 ease-in-out bg-[#121212] border-x border-b border-white/5 rounded-b-2xl mx-1 shadow-xl ${showQueue ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}
-                    >
-                        <div className="p-3 pt-4 space-y-2 max-h-72 overflow-y-auto">
-                            {!isPlayerReady && playerError && (
-                                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-3">
-                                    <p className="text-xs text-yellow-400">
-                                        ⚠️ {playerError} Click a track to open it in Spotify.
-                                    </p>
-                                </div>
-                            )}
-                            {isLoading ? (
-                                <div className="flex justify-center py-4">
-                                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                </div>
-                            ) : playlist?.tracks && playlist.tracks.length > 0 ? (
-                                <>
-                                    <p className="text-xs text-white/40 uppercase tracking-widest px-2 pb-1">
-                                        {playlist.name}
-                                    </p>
-                                    {playlist.tracks.map((track, i) => {
-                                        const isCurrent = Boolean(track.uri) && currentTrack?.uri === track.uri;
-                                        return (
-                                            <button
-                                                key={track.uri ?? i}
-                                                type="button"
-                                                onClick={() => {
-                                                    if (isPlayerReady && track.uri) {
-                                                        playTrack(track.uri, `spotify:playlist:${PLAYLIST_ID}`);
-                                                    } else if (track.spotifyUrl) {
-                                                        window.open(track.spotifyUrl, "_blank", "noopener,noreferrer");
-                                                    }
-                                                }}
-                                                aria-current={isCurrent}
-                                                className={`w-full text-left flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer group/item ${isCurrent ? "bg-white/10" : ""}`}
-                                            >
-                                                <Image
-                                                    src={track.albumImageUrl}
-                                                    alt=""
-                                                    width={40}
-                                                    height={40}
-                                                    className="w-10 h-10 rounded-md object-cover opacity-60 group-hover/item:opacity-100 transition-opacity"
-                                                />
-                                                <div className="flex-1 min-w-0">
-                                                    <p
-                                                        className={`text-sm font-medium truncate group-hover/item:text-white ${isCurrent ? "text-green-400" : "text-white/80"}`}
-                                                    >
-                                                        {track.name}
-                                                    </p>
-                                                    <p className="text-xs text-white/40 truncate">{track.artist}</p>
+                                        {/* Volume only affects the in-browser player */}
+                                        {mode === "sdk" && (
+                                            <div className="hidden sm:flex items-center gap-1.5 group/vol">
+                                                <button
+                                                    onClick={toggleMute}
+                                                    aria-label={isMuted ? "Unmute" : "Mute"}
+                                                    className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                                                >
+                                                    <VolumeIcon className="w-4 h-4" />
+                                                </button>
+                                                <div className="relative h-1 w-0 group-hover/vol:w-16 focus-within:w-16 transition-[width] duration-300 rounded-full bg-white/15 overflow-hidden group-hover/vol:overflow-visible">
+                                                    <div
+                                                        className="absolute inset-y-0 left-0 rounded-full bg-white/70"
+                                                        style={{ width: `${volume * 100}%` }}
+                                                    />
+                                                    <input
+                                                        type="range"
+                                                        min={0}
+                                                        max={1}
+                                                        step={0.01}
+                                                        value={volume}
+                                                        onChange={(e) => setVolume(Number(e.target.value))}
+                                                        aria-label="Volume"
+                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                    />
                                                 </div>
-                                                {isCurrent && !isPaused && (
-                                                    <div className="flex items-center gap-0.5">
-                                                        <div className="w-0.5 h-3 bg-green-500 motion-safe:animate-pulse" />
-                                                        <div className="w-0.5 h-4 bg-green-500 motion-safe:animate-pulse delay-75" />
-                                                        <div className="w-0.5 h-2 bg-green-500 motion-safe:animate-pulse delay-150" />
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={() => setShowQueue(!showQueue)}
+                                            aria-label="Toggle queue"
+                                            aria-expanded={showQueue}
+                                            className={`p-2 rounded-lg transition-colors hover:bg-white/10 ${showQueue ? "bg-white/10 text-white" : "text-white/40"}`}
+                                        >
+                                            <ListMusic className="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Seek bar — revealed on hover, and only when there's a track to seek
+                                        through. The 0fr/1fr grid row is what lets the collapse animate;
+                                        touch devices have no hover, so it stays open there. */}
+                                    {displayTrack && (
+                                        <div className="grid grid-rows-[0fr] opacity-0 transition-all duration-300 group-hover:grid-rows-[1fr] group-hover:opacity-100 focus-within:grid-rows-[1fr] focus-within:opacity-100 pointer-coarse:grid-rows-[1fr] pointer-coarse:opacity-100">
+                                            <div className="overflow-hidden">
+                                                <div className="flex items-center gap-2 mt-2.5 px-0.5">
+                                                    <span className="text-[10px] tabular-nums text-white/40 w-8 text-right shrink-0">
+                                                        {formatTime(displayMs)}
+                                                    </span>
+                                                    <div className="relative h-1 flex-1 rounded-full bg-white/15 group/seek">
+                                                        <div
+                                                            className="absolute inset-y-0 left-0 rounded-full bg-green-500"
+                                                            style={{ width: `${progressPercent}%` }}
+                                                        />
+                                                        {canSeek && (
+                                                            <div
+                                                                className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow opacity-0 group-hover/seek:opacity-100 group-focus-within/seek:opacity-100 transition-opacity"
+                                                                style={{ left: `${progressPercent}%` }}
+                                                            />
+                                                        )}
+                                                        <input
+                                                            type="range"
+                                                            min={0}
+                                                            max={durationMs || 1}
+                                                            step={1000}
+                                                            value={displayMs}
+                                                            disabled={!canSeek}
+                                                            aria-label="Seek"
+                                                            aria-valuetext={`${formatTime(displayMs)} of ${formatTime(durationMs)}`}
+                                                            onPointerDown={() => {
+                                                                isScrubbingRef.current = true;
+                                                            }}
+                                                            onChange={(e) => {
+                                                                const value = Number(e.target.value);
+                                                                // Keyboard input never fires pointerdown, so commit it right away.
+                                                                if (isScrubbingRef.current) setScrubMs(value);
+                                                                else commitSeek(value);
+                                                            }}
+                                                            onPointerUp={() => {
+                                                                isScrubbingRef.current = false;
+                                                                if (scrubMs !== null) commitSeek(scrubMs);
+                                                                setScrubMs(null);
+                                                            }}
+                                                            onPointerCancel={() => {
+                                                                isScrubbingRef.current = false;
+                                                                setScrubMs(null);
+                                                            }}
+                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-default"
+                                                        />
                                                     </div>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </>
-                            ) : (
-                                <p className="text-center text-xs text-white/30 py-4 uppercase tracking-widest">
-                                    No tracks available
-                                </p>
-                            )}
-                            <div className="flex items-center gap-2 p-2 rounded-lg text-white hover:bg-white/5 cursor-pointer justify-center border-t border-white/5 mt-2 pt-3">
-                                <a
-                                    href={`https://open.spotify.com/playlist/${PLAYLIST_ID}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1 text-sm text-white/60 hover:text-white"
+                                                    <span className="text-[10px] tabular-nums text-white/40 w-8 shrink-0">
+                                                        {formatTime(durationMs)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Queue / Playlist Dropdown */}
+                                <div
+                                    className={`overflow-hidden transition-all duration-300 ease-in-out bg-[#121212] border-x border-b border-white/5 rounded-b-2xl mx-1 shadow-xl ${showQueue ? "max-h-80 opacity-100" : "max-h-0 opacity-0"}`}
                                 >
-                                    Open in Spotify <ArrowUpRight className="w-4 h-4" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                                    <div className="p-3 pt-4 space-y-2 max-h-72 overflow-y-auto">
+                                        {!isPlayerReady && playerError && (
+                                            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-3">
+                                                <p className="text-xs text-yellow-400">
+                                                    ⚠️ {playerError} Click a track to open it in Spotify.
+                                                </p>
+                                            </div>
+                                        )}
+                                        {isLoading ? (
+                                            <div className="flex justify-center py-4">
+                                                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                            </div>
+                                        ) : playlist?.tracks && playlist.tracks.length > 0 ? (
+                                            <>
+                                                <p className="text-xs text-white/40 uppercase tracking-widest px-2 pb-1">
+                                                    {playlist.name}
+                                                </p>
+                                                {playlist.tracks.map((track, i) => {
+                                                    const isCurrent = Boolean(track.uri) && currentTrack?.uri === track.uri;
+                                                    return (
+                                                        <button
+                                                            key={track.uri ?? i}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (isPlayerReady && track.uri) {
+                                                                    playTrack(track.uri, `spotify:playlist:${PLAYLIST_ID}`);
+                                                                } else if (track.spotifyUrl) {
+                                                                    window.open(track.spotifyUrl, "_blank", "noopener,noreferrer");
+                                                                }
+                                                            }}
+                                                            aria-current={isCurrent}
+                                                            className={`w-full text-left flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer group/item ${isCurrent ? "bg-white/10" : ""}`}
+                                                        >
+                                                            <Image
+                                                                src={track.albumImageUrl}
+                                                                alt=""
+                                                                width={40}
+                                                                height={40}
+                                                                className="w-10 h-10 rounded-md object-cover opacity-60 group-hover/item:opacity-100 transition-opacity"
+                                                            />
+                                                            <div className="flex-1 min-w-0">
+                                                                <p
+                                                                    className={`text-sm font-medium truncate group-hover/item:text-white ${isCurrent ? "text-green-400" : "text-white/80"}`}
+                                                                >
+                                                                    {track.name}
+                                                                </p>
+                                                                <p className="text-xs text-white/40 truncate">{track.artist}</p>
+                                                            </div>
+                                                            {isCurrent && !isPaused && (
+                                                                <div className="flex items-center gap-0.5">
+                                                                    <div className="w-0.5 h-3 bg-green-500 motion-safe:animate-pulse" />
+                                                                    <div className="w-0.5 h-4 bg-green-500 motion-safe:animate-pulse delay-75" />
+                                                                    <div className="w-0.5 h-2 bg-green-500 motion-safe:animate-pulse delay-150" />
+                                                                </div>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </>
+                                        ) : (
+                                            <p className="text-center text-xs text-white/30 py-4 uppercase tracking-widest">
+                                                No tracks available
+                                            </p>
+                                        )}
+                                        <div className="flex items-center gap-2 p-2 rounded-lg text-white hover:bg-white/5 cursor-pointer justify-center border-t border-white/5 mt-2 pt-3">
+                                            <a
+                                                href={`https://open.spotify.com/playlist/${PLAYLIST_ID}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1 text-sm text-white/60 hover:text-white"
+                                            >
+                                                Open in Spotify <ArrowUpRight className="w-4 h-4" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <motion.button
+                                key="pill"
+                                type="button"
+                                onClick={() => setExpanded(true)}
+                                aria-expanded={false}
+                                aria-label={displayTrack ? `Show music controls — ${displayTrack.name}` : "Show music controls"}
+                                initial={{ opacity: 0, scale: 0.92 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.92 }}
+                                transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                                style={{ transformOrigin: "bottom right" }}
+                                className="flex max-w-[15rem] items-center gap-3 rounded-full border border-white/5 bg-[#121212] p-1.5 pr-4 text-left text-white shadow-2xl"
+                            >
+                                <span className="relative size-10 shrink-0 overflow-hidden rounded-full bg-white/10">
+                                    {displayTrack?.imgurl ? (
+                                        <Image src={displayTrack.imgurl} alt="" fill sizes="40px" className="object-cover" />
+                                    ) : (
+                                        <Music className="absolute inset-0 m-auto size-4 text-white/30" />
+                                    )}
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                    <span className={`block text-[9px] uppercase tracking-widest ${isPlaying ? "text-green-500" : "text-white/40"}`}>
+                                        {displayTrack ? (isPlaying ? "Now playing" : "Paused") : "Spotify"}
+                                    </span>
+                                    <span className="block truncate text-sm font-semibold leading-tight">
+                                        {displayTrack?.name || "Nothing playing"}
+                                    </span>
+                                </span>
+                                {/* Equalizer: bounces while something plays, rests as uneven bars
+                                    otherwise (equal dots would read as a "more" menu). */}
+                                <span aria-hidden className="flex h-3.5 shrink-0 items-end gap-[2px]">
+                                    {[
+                                        { delay: 0, rest: "45%" },
+                                        { delay: 0.2, rest: "80%" },
+                                        { delay: 0.4, rest: "60%" },
+                                    ].map(({ delay, rest }) => (
+                                        <span
+                                            key={delay}
+                                            className={`w-[3px] rounded-sm ${isPlaying ? "h-full origin-bottom bg-green-500 animate-equalizer" : "bg-white/30"}`}
+                                            style={isPlaying ? { animationDelay: `${delay}s` } : { height: rest }}
+                                        />
+                                    ))}
+                                </span>
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </div>
             )}
 
