@@ -29,7 +29,7 @@ export default function LibraryPage() {
     const currentlyReading = books.filter((b) => b.status === "reading").length;
 
     return (
-        <div className="hide-cursor min-h-screen bg-[#FBFBFB] font-crimson">
+        <div className="hide-cursor min-h-screen bg-[#FBFBFB] font-crimson dark:bg-background">
             <SmoothCursor />
             <div className="max-w-6xl mx-auto px-8 py-16">
                 {/* Header Section */}
@@ -37,10 +37,10 @@ export default function LibraryPage() {
                     <h1 className="text-6xl font-bold mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>
                         Library
                     </h1>
-                    <p className="text-gray-600 text-xl mb-2">
+                    <p className="text-gray-600 text-xl mb-2 dark:text-muted-foreground">
                         Books I&apos;m reading and have read lately.
                     </p>
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-gray-500 text-lg dark:text-muted-foreground">
                         Total read: {totalRead}
                     </p>
                 </div>
@@ -59,7 +59,7 @@ export default function LibraryPage() {
                                 data-aos-delay={index * 50}
                             >
                                 {/* Book Cover */}
-                                <div className="relative aspect-2/3 mb-3 overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-shadow duration-300 bg-gray-100">
+                                <div className="relative aspect-2/3 mb-3 overflow-hidden rounded-lg shadow-md group-hover:shadow-xl transition-shadow duration-300 bg-gray-100 dark:bg-muted">
                                     {book.coverUrl ? (
                                         <Image
                                             src={book.coverUrl}
@@ -69,12 +69,12 @@ export default function LibraryPage() {
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         />
                                     ) : (
-                                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-muted dark:to-secondary flex items-center justify-center">
                                             <div className="text-center p-6">
-                                                <p className="font-bold text-lg mb-2 text-gray-700">
+                                                <p className="font-bold text-lg mb-2 text-gray-700 dark:text-foreground">
                                                     {book.title}
                                                 </p>
-                                                <p className="text-sm text-gray-600">{book.author}</p>
+                                                <p className="text-sm text-gray-600 dark:text-muted-foreground">{book.author}</p>
                                             </div>
                                         </div>
                                     )}
@@ -85,24 +85,19 @@ export default function LibraryPage() {
                                     <h3 className="font-semibold text-lg mb-1 leading-tight line-clamp-2" title={book.title}>
                                         {book.title}
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">{book.author}</p>
+                                    <p className="text-gray-600 text-sm mb-2 dark:text-muted-foreground">{book.author}</p>
 
                                     <div className="mt-auto flex items-center justify-between gap-2">
                                         {/* Status Badge */}
                                         {book.status ? (
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span
-                                                    className={`text-xs px-2.5 py-1 rounded-full border ${book.status === "reading"
-                                                        ? "bg-white border-gray-300 text-gray-700"
-                                                        : book.status === "read"
-                                                            ? "bg-white border-gray-300 text-gray-700"
-                                                            : "bg-white border-gray-300 text-gray-700"
-                                                        }`}
+                                                    className="text-xs px-2.5 py-1 rounded-full border bg-white border-gray-300 text-gray-700 dark:bg-card dark:border-border dark:text-foreground"
                                                 >
                                                     {book.status}
                                                 </span>
                                                 {book.rating && (
-                                                    <span className="text-xs text-gray-600">
+                                                    <span className="text-xs text-gray-600 dark:text-muted-foreground">
                                                         {book.rating}/5
                                                     </span>
                                                 )}
@@ -115,7 +110,7 @@ export default function LibraryPage() {
                                                 href={book.buyLink}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-sm font-medium text-[#043360] hover:underline whitespace-nowrap"
+                                                className="text-sm font-medium text-brand hover:underline whitespace-nowrap"
                                             >
                                                 Buy on Amazon
                                             </a>

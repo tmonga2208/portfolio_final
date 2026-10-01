@@ -56,7 +56,7 @@ export function SectionHeading({
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
         <h2
           className={cn(
-            "flex flex-wrap gap-x-[0.25em] text-4xl font-bold text-[#043360] md:text-6xl",
+            "flex flex-wrap gap-x-[0.25em] text-4xl font-bold text-brand md:text-6xl",
             className
           )}
         >

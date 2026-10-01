@@ -124,7 +124,7 @@ export function ShowcaseList({
               <span
                 className={cn(
                   "shrink-0 text-xs uppercase tracking-[0.25em] transition-colors duration-500",
-                  isExpanded ? "text-[#043360]" : "text-muted-foreground group-hover:text-[#043360]"
+                  isExpanded ? "text-brand" : "text-muted-foreground group-hover:text-brand"
                 )}
               >
                 {String(i + 1).padStart(2, "0")}
@@ -132,8 +132,8 @@ export function ShowcaseList({
 
               <h3
                 className={cn(
-                  "min-w-0 flex-1 leading-[1.05] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:text-[#043360] md:group-hover:translate-x-4",
-                  isExpanded && "text-[#043360]",
+                  "min-w-0 flex-1 leading-[1.05] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:text-brand md:group-hover:translate-x-4",
+                  isExpanded && "text-brand",
                   v.title
                 )}
               >
@@ -146,8 +146,8 @@ export function ShowcaseList({
 
               <Plus
                 className={cn(
-                  "size-6 shrink-0 text-muted-foreground transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-[#043360]",
-                  isExpanded && "rotate-45 text-[#043360]"
+                  "size-6 shrink-0 text-muted-foreground transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-brand",
+                  isExpanded && "rotate-45 text-brand"
                 )}
               />
             </button>
@@ -179,7 +179,7 @@ export function ShowcaseList({
                         href={entry.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="link-underline mt-auto inline-flex w-fit items-center gap-1 font-semibold text-[#043360]"
+                        className="link-underline mt-auto inline-flex w-fit items-center gap-1 font-semibold text-brand"
                       >
                         Visit site
                         <ArrowUpRight className="size-4" />
@@ -240,7 +240,7 @@ export function ShowcaseList({
                   )}
                 />
               ))}
-              <span className="absolute bottom-3 left-3 rounded-full bg-[#043360] px-3 py-1 text-xs font-medium text-white">
+              <span className="absolute bottom-3 left-3 rounded-full bg-brand px-3 py-1 text-xs font-medium text-brand-foreground">
                 Click to expand
               </span>
             </div>

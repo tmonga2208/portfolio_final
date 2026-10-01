@@ -21,7 +21,7 @@ function CompanyName({ role }: { role: Experience }) {
                 alt={role.company}
                 width={role.logo.width}
                 height={role.logo.height}
-                className="h-10 w-auto"
+                className="h-10 w-auto dark:invert dark:hue-rotate-180"
                 priority={false}
             />
             <span className="sr-only">{role.company}</span>
@@ -60,9 +60,9 @@ function TimelineRole({ role }: { role: Experience }) {
                     viewport={{ once: true, amount: 0.1 }}
                     transition={{ duration: 1.2, ease: EASE }}
                     style={{ transformOrigin: "top" }}
-                    className="absolute bottom-0 top-3 w-px bg-[#043360]/30"
+                    className="absolute bottom-0 top-3 w-px bg-brand/30"
                 />
-                <span className="relative z-10 mt-1 size-3.5 rounded-full bg-[#043360]" />
+                <span className="relative z-10 mt-1 size-3.5 rounded-full bg-brand" />
             </div>
 
             <Reveal className="min-w-0 flex-1 pb-16 md:pb-20">
@@ -77,7 +77,7 @@ function TimelineRole({ role }: { role: Experience }) {
                     <CompanyName role={role} />
                 </div>
 
-                <p className="mt-2 text-xl italic text-[#043360]">{role.role}</p>
+                <p className="mt-2 text-xl italic text-brand">{role.role}</p>
 
                 {role.blurb && (
                     <p className="mt-5 max-w-3xl text-lg leading-relaxed text-foreground/80">
@@ -94,7 +94,7 @@ function TimelineRole({ role }: { role: Experience }) {
                             >
                                 <span
                                     aria-hidden="true"
-                                    className="mt-[0.6em] size-1.5 shrink-0 rounded-full bg-[#043360]"
+                                    className="mt-[0.6em] size-1.5 shrink-0 rounded-full bg-brand"
                                 />
                                 <span>{item}</span>
                             </li>
@@ -129,7 +129,7 @@ export function ExperienceList() {
             {/* Open end of the line — where the next role docks. */}
             <div className="flex items-center gap-6 md:gap-10">
                 <div className="flex w-4 shrink-0 justify-center" aria-hidden="true">
-                    <span className="size-3.5 rounded-full border-2 border-[#043360]/40 bg-background" />
+                    <span className="size-3.5 rounded-full border-2 border-brand/40 bg-background" />
                 </div>
                 <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground/60">
                     The next chapter

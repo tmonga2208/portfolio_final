@@ -10,6 +10,8 @@
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -55,8 +57,9 @@
 
 :root {
   --radius: 0.625rem;
-  /* Consumed by the CursorFollow label bubble, which otherwise falls back to indigo. */
-  --color-brand: #043360;
+  /* Accent navy. Lifted to a lighter blue in dark mode so it stays legible. */
+  --brand: #043360;
+  --brand-foreground: #faf9f6;
   --background: #FAF9F6;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -91,6 +94,8 @@
 }
 
 .dark {
+  --brand: #7fb2e5;
+  --brand-foreground: #0b1220;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -161,8 +166,8 @@ html {
 }
 
 ::selection {
-  background: #043360;
-  color: #faf9f6;
+  background: var(--brand);
+  color: var(--brand-foreground);
 }
 
 @keyframes music-pulse {
@@ -209,7 +214,7 @@ html {
 }
 .media-frame:hover {
   transform: translateY(-6px);
-  border-color: color-mix(in oklab, #043360 35%, transparent);
+  border-color: color-mix(in oklab, var(--brand) 35%, transparent);
   box-shadow: 0 18px 40px -22px rgb(4 51 96 / 0.45);
 }
 .media-frame img {
@@ -242,4 +247,13 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+/*
+ * Theme switch: the theme toggle reveals the new theme through its own
+ * clip-path animation, so turn off the browser's default cross-fade.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

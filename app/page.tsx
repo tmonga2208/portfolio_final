@@ -3,9 +3,12 @@
 import { ArrowUpRight, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import type { ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import { TravelPolaroid } from "@/components/travel-polaroid";
 import { blogData } from "@/types/blog";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
@@ -73,6 +76,22 @@ const PROJECTS: ShowcaseEntry[] = [
   },
 ];
 
+/** ClickSpark draws on a canvas, so it needs the brand colour as a literal. */
+function ThemedClickSpark({ children }: { children: ReactNode }) {
+  const { resolvedTheme } = useTheme();
+  return (
+    <ClickSpark
+      sparkColor={resolvedTheme === "dark" ? "#7fb2e5" : "#043360"}
+      sparkSize={10}
+      sparkRadius={15}
+      sparkCount={8}
+      duration={400}
+    >
+      {children}
+    </ClickSpark>
+  );
+}
+
 function Nav() {
   return (
     <motion.header
@@ -83,18 +102,19 @@ function Nav() {
     >
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-10">
         <Link href="/" className="text-xl font-bold tracking-tight">
-          Tarun <span className="text-[#043360]">Monga</span>
+          Tarun <span className="text-brand">Monga</span>
         </Link>
 
         <nav className="hidden gap-8 text-sm uppercase tracking-[0.15em] md:flex">
-          <Link href="#experience" className="link-underline transition-colors hover:text-[#043360]">Experience</Link>
-          <Link href="#work" className="link-underline transition-colors hover:text-[#043360]">Work</Link>
-          <Link href="#stack" className="link-underline transition-colors hover:text-[#043360]">Stack</Link>
-          <Link href="/library" className="link-underline transition-colors hover:text-[#043360]">Library</Link>
-          <Link href="#contact" className="link-underline transition-colors hover:text-[#043360]">Contact</Link>
+          <Link href="#experience" className="link-underline transition-colors hover:text-brand">Experience</Link>
+          <Link href="#work" className="link-underline transition-colors hover:text-brand">Work</Link>
+          <Link href="#stack" className="link-underline transition-colors hover:text-brand">Stack</Link>
+          <Link href="/library" className="link-underline transition-colors hover:text-brand">Library</Link>
+          <Link href="#contact" className="link-underline transition-colors hover:text-brand">Contact</Link>
         </nav>
 
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
           {[
             { href: "https://github.com/tmonga2208", Icon: Github, label: "GitHub" },
             { href: "https://www.linkedin.com/in/tarun-monga-b00008181/", Icon: Linkedin, label: "LinkedIn" },
@@ -105,7 +125,7 @@ function Nav() {
               whileTap={{ scale: 0.94 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Link href={href} aria-label={label} className="block transition-colors hover:text-[#043360]">
+              <Link href={href} aria-label={label} className="block transition-colors hover:text-brand">
                 <Icon className="size-5" />
               </Link>
             </motion.div>
@@ -118,7 +138,7 @@ function Nav() {
 
 export default function Home() {
   return (
-    <ClickSpark sparkColor="#043360" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+    <ThemedClickSpark>
       <Nav />
 
       <main className="mx-auto max-w-[1600px] font-crimson">
@@ -130,7 +150,7 @@ export default function Home() {
           <div className="mt-14 grid gap-12 md:grid-cols-[1fr_1fr]">
             <Reveal>
               <p className="text-3xl leading-tight md:text-5xl">
-                I&apos;m a <span className="italic text-[#043360]">software engineer</span> working
+                I&apos;m a <span className="italic text-brand">software engineer</span> working
                 across frontend and design systems — building interfaces that stay clear under
                 pressure.
               </p>
@@ -146,9 +166,9 @@ export default function Home() {
               <RevealItem>
                 <p>
                   Outside of code I{" "}
-                  <span className="font-semibold italic text-[#043360]">swim</span> to clear my head,
+                  <span className="font-semibold italic text-brand">swim</span> to clear my head,
                   and I try to read. Sometimes it works. Sometimes I just buy more{" "}
-                  <Link href="/library" className="link-underline font-semibold italic text-[#043360]">
+                  <Link href="/library" className="link-underline font-semibold italic text-brand">
                     books
                   </Link>
                   . Growth is a process.
@@ -229,12 +249,12 @@ export default function Home() {
                 <Link
                   href="mailto:tarunmonga2208@gmail.com"
                   data-cursor-text="Say hello"
-                  className="group inline-flex items-baseline transition-colors hover:text-[#043360]"
+                  className="group inline-flex items-baseline transition-colors hover:text-brand"
                 >
                   <span className="link-underline">Get in touch</span>
                   <ArrowUpRight className="inline size-12 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-2 group-hover:-translate-y-2 md:size-20" />
                 </Link>
-                <span className="italic text-[#043360]">. Let&apos;s talk.</span>
+                <span className="italic text-brand">. Let&apos;s talk.</span>
               </h2>
             </Magnetic>
           </Reveal>
@@ -245,6 +265,6 @@ export default function Home() {
           <span>Built with Next.js &amp; Three.js</span>
         </footer>
       </main>
-    </ClickSpark>
+    </ThemedClickSpark>
   );
 }

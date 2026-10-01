@@ -195,7 +195,7 @@ export function Hero() {
           initial="hidden"
           animate="show"
           aria-label="Tarun Monga"
-          className="flex w-full justify-between text-[15vw] font-bold leading-[0.85] tracking-tight text-[#043360] md:text-[13vw]"
+          className="flex w-full justify-between text-[15vw] font-bold leading-[0.85] tracking-tight text-brand md:text-[13vw]"
         >
           {"TARUN MONGA".split("").map((char, i) => (
             <span key={`${char}-${i}`} aria-hidden className="overflow-hidden py-[0.04em]">

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 import { Player } from "@/components/player";
 import { ScrollProgress } from "@/components/scroll-progress";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,13 +33,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // next-themes sets the class on <html> before hydration, which React would
+    // otherwise flag as a mismatch.
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${crimsonPro.variable} antialiased`}
       >
-        <ScrollProgress />
-        <Player />
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+          <ScrollProgress />
+          <Player />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
