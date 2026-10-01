@@ -17,7 +17,7 @@ const subscribeToClock = (onTick: () => void) => {
   return () => clearInterval(id);
 };
 
-/** Availability and Tarun's local time, under the contact headline. */
+/** Availability and Tarun's local time in Pune, under the contact headline. */
 export function Availability() {
   // Client-only: the page is prerendered at build time, so a server-rendered
   // time would be stale. The snapshot only changes when the minute does.
@@ -34,7 +34,7 @@ export function Availability() {
       </span>
       {time && (
         <span className="text-muted-foreground">
-          <time>{time}</time> in Gurugram
+          <time>{time}</time> in Pune
           {isSmallHours(time) && " · probably asleep — I'll reply in the morning"}
         </span>
       )}
