@@ -33,10 +33,13 @@ export function SectionHeading({
   children,
   index,
   className,
+  as: Heading = "h2",
 }: {
   children: string;
   index?: string;
   className?: string;
+  /** Heading level — h2 for page sections, h1 when it titles the page. */
+  as?: "h1" | "h2";
 }) {
   const words = children.split(" ");
 
@@ -54,7 +57,7 @@ export function SectionHeading({
         className="mb-6 block h-px w-full bg-border"
       />
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
-        <h2
+        <Heading
           className={cn(
             "flex flex-wrap gap-x-[0.25em] text-4xl font-bold text-brand md:text-6xl",
             className
@@ -67,7 +70,7 @@ export function SectionHeading({
               </motion.span>
             </span>
           ))}
-        </h2>
+        </Heading>
         {index && (
           <motion.span
             variants={meta}

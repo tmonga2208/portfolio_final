@@ -1,18 +1,16 @@
 "use client";
 
-import { ArrowUpRight, Command, Github, Linkedin } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import type { MouseEvent, ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
-import FlowingMenu from "@/components/FlowingMenu";
 import { ScrollVelocity } from "@/components/ScrollVelocity";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { openCommandPalette } from "@/components/command-palette";
 import { TravelSection } from "@/components/travel-section";
 import { NowPlayingBadge } from "@/components/now-playing";
-import { copyEmail, EMAIL, GITHUB_URL, LINKEDIN_URL } from "@/lib/contact";
+import { copyEmail, EMAIL } from "@/lib/contact";
+import { SiteNav } from "@/components/site-nav";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
 import { SectionHeading } from "@/components/section-heading";
@@ -80,17 +78,6 @@ const PROJECTS: ShowcaseEntry[] = [
   },
 ];
 
-const MENU_ITEMS = [
-  { link: "#about", text: "About", image: "/img5.jpeg" },
-  { link: "#experience", text: "Experience", image: "/resolute/i1.png" },
-  { link: "#work", text: "Work", image: "/chauhan/image.png" },
-  { link: "#projects", text: "Projects", image: "/forge/i1.png" },
-  { link: "#travel", text: "Travel", image: "/travel/t1.JPG" },
-  { link: "#gallery", text: "Gallery", image: "/gallery/g05.jpg" },
-  { link: "/library", text: "Library", image: "/img3.JPG" },
-  { link: "#contact", text: "Contact", image: "/img1.JPG" },
-];
-
 /** ClickSpark draws on a canvas, so it needs the brand colour as a literal. */
 function ThemedClickSpark({ children }: { children: ReactNode }) {
   const { resolvedTheme } = useTheme();
@@ -122,64 +109,10 @@ async function handleContactClick(e: MouseEvent<HTMLAnchorElement>) {
   if (!(await copyEmail())) window.location.href = `mailto:${EMAIL}`;
 }
 
-function Nav() {
-  return (
-    <motion.header
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-md"
-    >
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-4 md:px-10">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          Tarun <span className="text-brand">Monga</span>
-        </Link>
-
-        <nav className="hidden gap-8 text-sm uppercase tracking-[0.15em] md:flex">
-          <Link href="#experience" className="link-underline transition-colors hover:text-brand">Experience</Link>
-          <Link href="#work" className="link-underline transition-colors hover:text-brand">Work</Link>
-          <Link href="#stack" className="link-underline transition-colors hover:text-brand">Stack</Link>
-          <Link href="/library" className="link-underline transition-colors hover:text-brand">Library</Link>
-          <Link href="#contact" className="link-underline transition-colors hover:text-brand">Contact</Link>
-        </nav>
-
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={openCommandPalette}
-            aria-label="Open command palette"
-            data-cursor-text="Search everything"
-            className="hidden items-center gap-1.5 rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground transition-colors hover:border-brand hover:text-brand md:flex"
-          >
-            <Command className="size-3.5" />K
-          </button>
-          <ThemeToggle />
-          {[
-            { href: GITHUB_URL, Icon: Github, label: "GitHub" },
-            { href: LINKEDIN_URL, Icon: Linkedin, label: "LinkedIn" },
-          ].map(({ href, Icon, label }) => (
-            <motion.div
-              key={label}
-              whileHover={{ y: -3, scale: 1.12 }}
-              whileTap={{ scale: 0.94 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            >
-              <Link href={href} aria-label={label} className="block transition-colors hover:text-brand">
-                <Icon className="size-5" />
-              </Link>
-            </motion.div>
-          ))}
-          <FlowingMenu items={MENU_ITEMS} className="md:hidden" />
-        </div>
-      </div>
-    </motion.header>
-  );
-}
-
 export default function Home() {
   return (
     <ThemedClickSpark>
-      <Nav />
+      <SiteNav />
 
       <main className="mx-auto max-w-[1600px] font-crimson">
         <Hero />
