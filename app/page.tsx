@@ -185,7 +185,7 @@ export default function Home() {
               <RevealItem>
                 <p>
                   Outside of code I{" "}
-                  <span className="font-semibold italic text-brand">swim</span> to clear my head,
+                  <span className="font-semibold italic text-brand" data-cursor-text="psst — type it">swim</span> to clear my head,
                   and I try to read. Sometimes it works. Sometimes I just buy more{" "}
                   <Link href="/library" className="link-underline font-semibold italic text-brand">
                     books
