@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { BlogContent } from "@/types/blog";
+import { useIsClient } from "@/hooks/use-is-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -19,9 +20,7 @@ const CARD_POSES = [
 
 export function TravelPolaroid({ blog }: { blog: BlogContent }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useIsClient();
 
   // Lock the page behind the overlay while it is open.
   useEffect(() => {

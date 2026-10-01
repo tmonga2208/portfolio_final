@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useIsClient } from "@/hooks/use-is-client";
 import { books } from "@/types/library";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,11 +23,7 @@ function BookSkeleton() {
 }
 
 export default function LibraryPage() {
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        setIsLoading(false);
-    }, []);
+    const isLoading = !useIsClient();
 
     const totalRead = books.filter((b) => b.status === "read").length;
     const currentlyReading = books.filter((b) => b.status === "reading").length;
@@ -42,7 +38,7 @@ export default function LibraryPage() {
                         Library
                     </h1>
                     <p className="text-gray-600 text-xl mb-2">
-                        Books I'm reading and have read lately.
+                        Books I&apos;m reading and have read lately.
                     </p>
                     <p className="text-gray-500 text-lg">
                         Total read: {totalRead}

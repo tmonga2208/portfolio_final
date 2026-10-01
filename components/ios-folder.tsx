@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
 import Image from "next/image"
 import type { BlogContent } from "@/types/blog"
+import { useIsClient } from "@/hooks/use-is-client"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface IOSFolderProps {
@@ -14,9 +15,7 @@ interface IOSFolderProps {
 
 export function IOSFolder({ blog }: IOSFolderProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => setMounted(true), [])
+    const mounted = useIsClient()
 
     // Lock the page behind the overlay while it is open.
     useEffect(() => {

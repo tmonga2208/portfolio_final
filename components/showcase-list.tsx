@@ -5,8 +5,10 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useIsClient } from "@/hooks/use-is-client";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export type ShowcaseEntry = {
   title: string;
@@ -50,14 +52,11 @@ export function ShowcaseList({
   const [hovered, setHovered] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [previewIdx, setPreviewIdx] = useState(0);
-  const [canHover, setCanHover] = useState(false);
   const [lightbox, setLightbox] = useState<{ entry: number; image: number } | null>(null);
 
   // Touch devices fire synthetic mouse events on tap, which would flash the
   // floating preview under the finger — gate it on a real hover pointer.
-  useEffect(() => {
-    setCanHover(window.matchMedia("(hover: hover)").matches);
-  }, []);
+  const canHover = useMediaQuery("(hover: hover)");
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -88,7 +87,6 @@ export function ShowcaseList({
   // Cycle through the hovered entry's screenshots.
   useEffect(() => {
     if (hovered === null) return;
-    setPreviewIdx(0);
     const id = setInterval(() => setPreviewIdx((p) => p + 1), 1400);
     return () => clearInterval(id);
   }, [hovered]);
@@ -113,6 +111,8 @@ export function ShowcaseList({
                 // Snap the spring onto the pointer when the preview first
                 // appears, so it doesn't fly in from wherever it was parked.
                 if (hovered === null) place(e.clientX, e.clientY, true);
+                // Each entry's slideshow starts from its first screenshot.
+                if (hovered !== i) setPreviewIdx(0);
                 setHovered(i);
               }}
               aria-expanded={isExpanded}
@@ -271,17 +271,14 @@ function Lightbox({
   onIndexChange: (index: number) => void;
   onClose: () => void;
 }) {
-  const [mounted, setMounted] = useState(false);
-  const indexRef = useRef(index);
-  indexRef.current = index;
+  const mounted = useIsClient();
 
   const step = useCallback(
-    (dir: 1 | -1) => onIndexChange((indexRef.current + dir + images.length) % images.length),
-    [images.length, onIndexChange]
+    (dir: 1 | -1) => onIndexChange((index + dir + images.length) % images.length),
+    [index, images.length, onIndexChange]
   );
 
   useEffect(() => {
-    setMounted(true);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") step(1);
