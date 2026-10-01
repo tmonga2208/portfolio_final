@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import type { MouseEvent, ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
+import FlowingMenu from "@/components/FlowingMenu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { openCommandPalette } from "@/components/command-palette";
 import { TravelSection } from "@/components/travel-section";
@@ -76,6 +77,17 @@ const PROJECTS: ShowcaseEntry[] = [
       { src: "/subpip/i3.png", alt: "SubPIP - Screenshot 3" },
     ],
   },
+];
+
+const MENU_ITEMS = [
+  { link: "#about", text: "About", image: "/img5.jpeg" },
+  { link: "#experience", text: "Experience", image: "/resolute/i1.png" },
+  { link: "#work", text: "Work", image: "/chauhan/image.png" },
+  { link: "#projects", text: "Projects", image: "/forge/i1.png" },
+  { link: "#travel", text: "Travel", image: "/travel/t1.JPG" },
+  { link: "#gallery", text: "Gallery", image: "/gallery/g05.jpg" },
+  { link: "/library", text: "Library", image: "/img3.JPG" },
+  { link: "#contact", text: "Contact", image: "/img1.JPG" },
 ];
 
 /** ClickSpark draws on a canvas, so it needs the brand colour as a literal. */
@@ -149,6 +161,7 @@ function Nav() {
               </Link>
             </motion.div>
           ))}
+          <FlowingMenu items={MENU_ITEMS} className="md:hidden" />
         </div>
       </div>
     </motion.header>

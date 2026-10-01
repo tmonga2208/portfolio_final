@@ -1,50 +1,109 @@
-"use client"
-import React, { useState } from 'react';
-import { gsap } from 'gsap';
-import { MenuIcon, XIcon } from 'lucide-react';
+"use client";
 
+import { gsap } from "gsap";
+import { AnimatePresence, motion } from "framer-motion";
+import { MenuIcon, XIcon } from "lucide-react";
+import { createPortal } from "react-dom";
+import React, { useEffect, useState } from "react";
+import { useIsClient } from "@/hooks/use-is-client";
 
 interface MenuItemProps {
   link: string;
   text: string;
   image: string;
+  onNavigate?: () => void;
 }
 
 interface FlowingMenuProps {
-  items?: MenuItemProps[];
+  items?: Omit<MenuItemProps, "onNavigate">[];
+  className?: string;
 }
 
-const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [] }) => {
-  const [menu, setMenu] = useState(false);
+/**
+ * Full-screen menu: each row floods with a scrolling band of its label and a
+ * photo, entering from whichever edge the pointer came in through.
+ */
+const FlowingMenu: React.FC<FlowingMenuProps> = ({ items = [], className = "" }) => {
+  const [open, setOpen] = useState(false);
+  // True only on the client, so the portal never renders during SSR.
+  const mounted = useIsClient();
+
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <div className="w-full h-full overflow-hidden z-50">
-      {menu ? (
-        <div className='absolute top-0 left-0 w-full h-full bg-black z-50'>
-          <XIcon className='text-white cursor-pointer flex w-full justify-end items-end  m-2' onClick={() => setMenu(false)} />
-          <nav className="flex flex-col h-full m-0 p-0">
-            {items.map((item, idx) => (
-              <MenuItem key={idx} {...item} />
-            ))}
-          </nav>
-        </div>
-      ) : (
-        <MenuIcon onClick={() => setMenu(true)} />
-      )}
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={open}
+        className={`block transition-colors hover:text-brand ${className}`}
+      >
+        <MenuIcon className="size-5" />
+      </button>
+
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu"
+                initial={{ clipPath: "inset(0 0 100% 0)" }}
+                animate={{ clipPath: "inset(0 0 0% 0)" }}
+                exit={{ clipPath: "inset(0 0 100% 0)" }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="fixed inset-0 z-[140] flex flex-col bg-[#060010] font-sans"
+              >
+                <div className="flex justify-end p-5">
+                  <button
+                    type="button"
+                    autoFocus
+                    onClick={() => setOpen(false)}
+                    aria-label="Close menu"
+                    className="rounded-full p-2 text-white transition-colors hover:bg-white/10"
+                  >
+                    <XIcon className="size-6" />
+                  </button>
+                </div>
+                <nav className="flex flex-1 flex-col">
+                  {items.map((item) => (
+                    <MenuItem key={item.link} {...item} onNavigate={() => setOpen(false)} />
+                  ))}
+                </nav>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
   );
 };
 
-const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ link, text, image, onNavigate }) => {
   const itemRef = React.useRef<HTMLDivElement>(null);
   const marqueeRef = React.useRef<HTMLDivElement>(null);
   const marqueeInnerRef = React.useRef<HTMLDivElement>(null);
 
-  const animationDefaults = { duration: 0.6, ease: 'expo' };
+  const animationDefaults = { duration: 0.6, ease: "expo" };
 
-  const findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): 'top' | 'bottom' => {
+  const findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): "top" | "bottom" => {
     const topEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY, 2);
     const bottomEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY - height, 2);
-    return topEdgeDist < bottomEdgeDist ? 'top' : 'bottom';
+    return topEdgeDist < bottomEdgeDist ? "top" : "bottom";
   };
 
   const handleMouseEnter = (ev: React.MouseEvent<HTMLAnchorElement>) => {
@@ -52,10 +111,11 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
     const rect = itemRef.current.getBoundingClientRect();
     const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height);
 
-    const tl = gsap.timeline({ defaults: animationDefaults });
-    tl.set(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' })
-      .set(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' })
-      .to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' });
+    gsap
+      .timeline({ defaults: animationDefaults })
+      .set(marqueeRef.current, { y: edge === "top" ? "-101%" : "101%" })
+      .set(marqueeInnerRef.current, { y: edge === "top" ? "101%" : "-101%" })
+      .to([marqueeRef.current, marqueeInnerRef.current], { y: "0%" });
   };
 
   const handleMouseLeave = (ev: React.MouseEvent<HTMLAnchorElement>) => {
@@ -63,40 +123,43 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
     const rect = itemRef.current.getBoundingClientRect();
     const edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height);
 
-    const tl = gsap.timeline({ defaults: animationDefaults }) as TimelineMax;
-    tl.to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }).to(marqueeInnerRef.current, {
-      y: edge === 'top' ? '101%' : '-101%'
-    });
+    gsap
+      .timeline({ defaults: animationDefaults })
+      .to(marqueeRef.current, { y: edge === "top" ? "-101%" : "101%" })
+      .to(marqueeInnerRef.current, { y: edge === "top" ? "101%" : "-101%" });
   };
 
-  const repeatedMarqueeContent = React.useMemo(() => {
-    return Array.from({ length: 4 }).map((_, idx) => (
-      <React.Fragment key={idx}>
-        <span className="text-[#060010] uppercase font-normal text-[4vh] leading-[1.2] p-[1vh_1vw_0]">{text}</span>
-        <div
-          className="w-[200px] h-[7vh] my-[2em] mx-[2vw] p-[1em_0] rounded-[50px] bg-cover bg-center"
-          style={{ backgroundImage: `url(${image})` }}
-        />
-      </React.Fragment>
-    ));
-  }, [text, image]);
+  const repeatedMarqueeContent = React.useMemo(
+    () =>
+      Array.from({ length: 4 }).map((_, idx) => (
+        <React.Fragment key={idx}>
+          <span className="p-[1vh_1vw_0] text-[4vh] font-normal uppercase leading-[1.2] text-[#060010]">{text}</span>
+          <div
+            className="mx-[2vw] my-[2em] h-[7vh] w-[200px] rounded-[50px] bg-cover bg-center p-[1em_0]"
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        </React.Fragment>
+      )),
+    [text, image]
+  );
 
   return (
-    <div className="flex-1 relative overflow-hidden text-center shadow-[0_-1px_0_0_#fff]" ref={itemRef}>
+    <div className="relative flex-1 overflow-hidden text-center shadow-[0_-1px_0_0_#fff]" ref={itemRef}>
       <a
-        className="flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-white text-[4vh] hover:text-[#060010] focus:text-white focus-visible:text-[#060010]"
+        className="relative flex h-full cursor-pointer items-center justify-center text-[4vh] font-semibold uppercase text-white no-underline hover:text-[#060010] focus:text-white focus-visible:text-[#060010]"
         href={link}
+        onClick={onNavigate}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {text}
       </a>
       <div
-        className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none bg-white translate-y-[101%]"
+        className="pointer-events-none absolute left-0 top-0 h-full w-full translate-y-[101%] overflow-hidden bg-white"
         ref={marqueeRef}
       >
-        <div className="h-full w-[200%] flex" ref={marqueeInnerRef}>
-          <div className="flex items-center relative h-full w-[200%] will-change-transform animate-marquee">
+        <div className="flex h-full w-[200%]" ref={marqueeInnerRef}>
+          <div className="relative flex h-full w-[200%] animate-marquee items-center will-change-transform">
             {repeatedMarqueeContent}
           </div>
         </div>
@@ -106,26 +169,3 @@ const MenuItem: React.FC<MenuItemProps> = ({ link, text, image }) => {
 };
 
 export default FlowingMenu;
-
-// Note: this is also needed
-// /** @type {import('tailwindcss').Config} */
-// export default {
-//   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-//   theme: {
-//     extend: {
-//       translate: {
-//         '101': '101%',
-//       },
-//       keyframes: {
-//         marquee: {
-//           'from': { transform: 'translateX(0%)' },
-//           'to': { transform: 'translateX(-50%)' }
-//         }
-//       },
-//       animation: {
-//         marquee: 'marquee 15s linear infinite'
-//       }
-//     }
-//   },
-//   plugins: [],
-// };
