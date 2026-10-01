@@ -18,8 +18,27 @@ const CARD_POSES = [
   { rest: { rotate: -1, x: 0, y: -4 }, hover: { rotate: 1, x: 0, y: -26 } },
 ];
 
-export function TravelPolaroid({ blog }: { blog: BlogContent }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function TravelPolaroid({
+  blog,
+  open,
+  onOpenChange,
+  highlighted = false,
+  onHoverChange,
+}: {
+  blog: BlogContent;
+  /** Fan the pile out as if hovered — used when its pin is hovered on the map. */
+  highlighted?: boolean;
+  onHoverChange?: (hovered: boolean) => void;
+  /** Control the story overlay from outside (the travel map opens it too). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open ?? internalOpen;
+  const setIsOpen = (next: boolean) => {
+    setInternalOpen(next);
+    onOpenChange?.(next);
+  };
   const mounted = useIsClient();
 
   // Lock the page behind the overlay while it is open.
@@ -36,11 +55,13 @@ export function TravelPolaroid({ blog }: { blog: BlogContent }) {
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
+      if (e.key !== "Escape") return;
+      setInternalOpen(false);
+      onOpenChange?.(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen]);
+  }, [isOpen, onOpenChange]);
 
   const photos = blog.thumbnails.slice(0, 3);
   // With fewer than 3 photos, skip the earliest poses so the last photo still
@@ -54,8 +75,10 @@ export function TravelPolaroid({ blog }: { blog: BlogContent }) {
         layoutId={`trip-${blog.id}`}
         onClick={() => setIsOpen(true)}
         initial="rest"
-        animate="rest"
+        animate={highlighted ? "hover" : "rest"}
         whileHover="hover"
+        onHoverStart={() => onHoverChange?.(true)}
+        onHoverEnd={() => onHoverChange?.(false)}
         whileTap={{ scale: 0.97 }}
         aria-label={`Open ${blog.title}`}
         className="relative h-56 w-56 cursor-pointer md:h-64 md:w-64"

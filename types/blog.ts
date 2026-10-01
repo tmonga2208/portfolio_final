@@ -3,6 +3,8 @@ export interface BlogContent {
     title: string
     subtitle: string
     location: string
+    /** Where the pin goes on the travel map. */
+    coords: { lat: number; lng: number }
     heroImage: string
     thumbnails: string[]
     sections: Array<{
@@ -17,6 +19,7 @@ export const blogData: BlogContent[] = [
         title: "Tulga Travels",
         subtitle: "Mountains, friends, and slow mornings",
         location: "Tulga, Himachal Pradesh, India",
+        coords: { lat: 32.02, lng: 77.43 },
         heroImage: "/travel/t1.JPG",
         thumbnails: [
             "/travel/t1.JPG",
@@ -64,6 +67,7 @@ export const blogData: BlogContent[] = [
         title: "Dharamshala Diaries",
         subtitle: "Trek trails, cricket nights, and mountain streets",
         location: "Dharamshala, Himachal Pradesh, India",
+        coords: { lat: 32.22, lng: 76.32 },
         heroImage: "/travel/df1.JPG",
         thumbnails: [
             "/travel/df1.JPG",
@@ -111,6 +115,7 @@ export const blogData: BlogContent[] = [
         title: "Doon & Landour",
         subtitle: "A family trip through Dehradun and Mussoorie",
         location: "Dehradun & Mussoorie, Uttarakhand, India",
+        coords: { lat: 30.4, lng: 78.05 },
         heroImage: "/travel/dm2.jpg",
         thumbnails: ["/travel/dm2.jpg", "/travel/dm1.jpg"],
         sections: [
@@ -144,6 +149,7 @@ export const blogData: BlogContent[] = [
         title: "Goa, Monsoon Edition",
         subtitle: "A monsoon Rakshabandhan trip to Palolem with Di",
         location: "Palolem, South Goa, India",
+        coords: { lat: 15.01, lng: 74.02 },
         heroImage: "/travel/goa1.jpg",
         thumbnails: ["/travel/goa2.jpg", "/travel/goa1.jpg"],
         sections: [

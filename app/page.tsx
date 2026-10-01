@@ -6,10 +6,9 @@ import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import type { MouseEvent, ReactNode } from "react";
 import ClickSpark from "@/components/ClickSpark";
-import { TravelPolaroid } from "@/components/travel-polaroid";
-import { blogData } from "@/types/blog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { openCommandPalette } from "@/components/command-palette";
+import { TravelSection } from "@/components/travel-section";
 import { copyEmail, EMAIL, GITHUB_URL, LINKEDIN_URL } from "@/lib/contact";
 import { Hero } from "@/components/hero";
 import { Reveal, RevealGroup, RevealItem } from "@/components/reveal";
@@ -232,17 +231,10 @@ export default function Home() {
           <SectionHeading index="06 / Beyond the Code">Travel</SectionHeading>
           <Reveal>
             <p className="mt-14 max-w-2xl text-2xl leading-snug text-muted-foreground">
-              Some places I&apos;ve been. Open a photo pile.
+              Some places I&apos;ve been. Pick a pin, or open a photo pile.
             </p>
           </Reveal>
-          {/* Inset so the hover fan-out never clips at the viewport edge. */}
-          <RevealGroup className="mt-14 flex flex-wrap gap-x-24 gap-y-16 px-6 md:px-16">
-            {blogData.map((blog) => (
-              <RevealItem key={blog.id}>
-                <TravelPolaroid blog={blog} />
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          <TravelSection />
         </section>
 
         {/* 07 — Gallery */}
