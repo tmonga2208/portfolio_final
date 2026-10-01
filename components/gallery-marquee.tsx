@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import CursorFollow from "@/components/smoothui/cursor-follow";
 import { cn } from "@/lib/utils";
 
 type Photo = {
@@ -64,12 +63,10 @@ function MarqueeRow({ photos, reverse = false }: { photos: Photo[]; reverse?: bo
 
 export function GalleryMarquee() {
   return (
-    <CursorFollow className="z-auto">
-      <div className="flex flex-col gap-8 md:gap-10">
-        <MarqueeRow photos={TOP_ROW} />
-        <div className="h-px bg-border" />
-        <MarqueeRow photos={BOTTOM_ROW} reverse />
-      </div>
-    </CursorFollow>
+    <div className="flex flex-col gap-8 md:gap-10">
+      <MarqueeRow photos={TOP_ROW} />
+      <div className="h-px bg-border" />
+      <MarqueeRow photos={BOTTOM_ROW} reverse />
+    </div>
   );
 }

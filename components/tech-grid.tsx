@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import CursorFollow from "@/components/smoothui/cursor-follow";
 import { cn } from "@/lib/utils";
 
 type Tech = {
@@ -150,7 +149,7 @@ const TECHS: Tech[] = [
  */
 export function TechGrid() {
   return (
-    <CursorFollow className="z-auto">
+    <div>
       <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border sm:grid-cols-3 md:grid-cols-5">
         {TECHS.map((tech) => (
           <div
@@ -174,6 +173,6 @@ export function TechGrid() {
       <p className="mt-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
         Dimmed — also familiar with
       </p>
-    </CursorFollow>
+    </div>
   );
 }

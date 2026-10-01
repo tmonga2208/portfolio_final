@@ -154,7 +154,7 @@
 
 /*
  * Only hide the native cursor where a replacement is actually rendered. Applying this
- * globally left the homepage with no cursor at all outside <CursorFollow>.
+ * globally left the homepage with no cursor at all on most of the page.
  */
 .hide-cursor,
 .hide-cursor * {
