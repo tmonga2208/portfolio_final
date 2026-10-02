@@ -23,7 +23,7 @@ import { Magnetic } from "@/components/magnetic";
 import { TechGrid } from "@/components/tech-grid";
 import { ExperienceList } from "@/components/experience";
 import { ShowcaseList, type ShowcaseEntry } from "@/components/showcase-list";
-import { GalleryMarquee } from "@/components/gallery-marquee";
+import { FilmStrips } from "@/components/gallery/film-strips";
 
 const WORK: ShowcaseEntry[] = [
   {
@@ -221,9 +221,9 @@ export default function Home() {
           <div className="px-6 md:px-10">
             <SectionHeading index="07 / Moments">My Gallery</SectionHeading>
           </div>
-          <Reveal className="mt-14">
-            <GalleryMarquee />
-          </Reveal>
+          <div className="mt-8 md:mt-10">
+            <FilmStrips />
+          </div>
         </section>
 
         {/* 08 — Contact */}
