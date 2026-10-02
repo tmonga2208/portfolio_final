@@ -17,7 +17,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
  * A settled `filter: blur(0px)` still makes the element a containing block for
- * `position: fixed` descendants, which traps overlays (e.g. IOSFolder) inside the
+ * `position: fixed` descendants, which traps overlays (like a story popup) inside the
  * wrapper. Motion never resolves the filter back to `none`, so we clear it ourselves
  * once the animation lands.
  */
