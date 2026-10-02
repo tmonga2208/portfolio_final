@@ -1,4 +1,4 @@
-/** Places on the travel map besides the trips (which live in types/blog.ts). */
+/** Places on the travel map besides the trips (which live in content/travel). */
 export interface Place {
     name: string;
     coords: { lat: number; lng: number };

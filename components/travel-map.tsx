@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { BlogContent } from "@/types/blog";
+import type { Trip } from "@/types/travel";
 import { ALSO_VISITED, HOME, NOW } from "@/types/places";
 
 type Coords = { lat: number; lng: number };
@@ -61,7 +61,7 @@ const arc = (a: Point, b: Point) => {
 };
 
 /** Which side of its pin a label sits, so labels stay inside the inset and off each other. */
-const labelSide = (point: Point, trip: BlogContent): "left" | "right" =>
+const labelSide = (point: Point, trip: Trip): "left" | "right" =>
   trip.mapLabelSide ?? (point.x > INSET.x + INSET.w * 0.6 ? "left" : "right");
 
 const LATS = [15, 20, 25, 30];
@@ -73,7 +73,7 @@ export function TravelMap({
   onHover,
   onSelect,
 }: {
-  trips: BlogContent[];
+  trips: Trip[];
   activeId: string | null;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
@@ -90,7 +90,7 @@ export function TravelMap({
     .filter(inNorth)
     .map(project);
 
-  const active = pins.find((pin) => pin.trip.id === activeId);
+  const active = pins.find((pin) => pin.trip.slug === activeId);
   // The route starts from home wherever the trip is drawn: the inset for the
   // north, the chart for anywhere else.
   const routeFrom = active && inNorth(active.trip.coords) ? home : project(HOME.coords);
@@ -162,7 +162,7 @@ export function TravelMap({
       {/* Home to the hovered trip. */}
       {active && (
         <motion.path
-          key={active.trip.id}
+          key={active.trip.slug}
           d={arc(routeFrom, active)}
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
@@ -206,25 +206,25 @@ export function TravelMap({
       </g>
 
       {pins.map(({ trip, x, y }) => {
-        const isActive = trip.id === activeId;
+        const isActive = trip.slug === activeId;
         const side = labelSide({ x, y }, trip);
         return (
           <g
-            key={trip.id}
+            key={trip.slug}
             role="button"
             tabIndex={0}
             aria-label={`Open ${trip.title}`}
             data-marker="trip"
             data-cursor-text={trip.title}
-            onMouseEnter={() => onHover(trip.id)}
+            onMouseEnter={() => onHover(trip.slug)}
             onMouseLeave={() => onHover(null)}
-            onFocus={() => onHover(trip.id)}
+            onFocus={() => onHover(trip.slug)}
             onBlur={() => onHover(null)}
-            onClick={() => onSelect(trip.id)}
+            onClick={() => onSelect(trip.slug)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                onSelect(trip.id);
+                onSelect(trip.slug);
               }
             }}
             className="cursor-pointer outline-none"

@@ -1,26 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Caveat } from "next/font/google";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { BlogContent } from "@/types/blog";
-import { useIsClient } from "@/hooks/use-is-client";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion } from "framer-motion";
+import { scribbledMonth, type Trip } from "@/types/travel";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Handwriting for the note on the cover print. */
 const hand = Caveat({ subsets: ["latin"], weight: "500", display: "swap" });
 
-/** "2026-08" → "Aug '26", the way you'd scribble it on a print. */
-function scribbledMonth(when: string) {
-  const [year, month] = when.split("-").map(Number);
-  const name = new Date(Date.UTC(year, month - 1)).toLocaleString("en", { month: "short", timeZone: "UTC" });
-  return `${name} '${String(year).slice(2)}`;
-}
+/** A real link, so the story can also be opened in a new tab or shared. */
+const MotionLink = motion.create(Link);
 
 /** Back-to-front: two photos peeking out behind, the cover on top. */
 const CARD_POSES = [
@@ -30,69 +22,33 @@ const CARD_POSES = [
 ];
 
 export function TravelPolaroid({
-  blog,
-  open,
-  onOpenChange,
+  trip,
   highlighted = false,
   onHoverChange,
 }: {
-  blog: BlogContent;
+  trip: Trip;
   /** Fan the pile out as if hovered — used when its pin is hovered on the map. */
   highlighted?: boolean;
   onHoverChange?: (hovered: boolean) => void;
-  /** Control the story overlay from outside (the travel map opens it too). */
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
 }) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = open ?? internalOpen;
-  const setIsOpen = (next: boolean) => {
-    setInternalOpen(next);
-    onOpenChange?.(next);
-  };
-  const mounted = useIsClient();
-
-  // Lock the page behind the overlay while it is open.
-  useEffect(() => {
-    if (!isOpen) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [isOpen]);
-
-  // Close on Escape.
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setInternalOpen(false);
-      onOpenChange?.(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, onOpenChange]);
-
-  const photos = blog.thumbnails.slice(0, 3);
+  const photos = trip.pile.slice(0, 3);
   // With fewer than 3 photos, skip the earliest poses so the last photo still
   // lands the straight cover pose instead of a tilted background one.
   const poseOffset = CARD_POSES.length - photos.length;
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <motion.button
-        type="button"
-        layoutId={`trip-${blog.id}`}
-        onClick={() => setIsOpen(true)}
+      <MotionLink
+        href={`/travel/${trip.slug}`}
+        scroll={false}
         initial="rest"
         animate={highlighted ? "hover" : "rest"}
         whileHover="hover"
         onHoverStart={() => onHoverChange?.(true)}
         onHoverEnd={() => onHoverChange?.(false)}
         whileTap={{ scale: 0.97 }}
-        aria-label={`Open ${blog.title}`}
-        className="relative h-56 w-56 cursor-pointer md:h-64 md:w-64"
+        aria-label={`Open ${trip.title}`}
+        className="relative block h-56 w-56 cursor-pointer md:h-64 md:w-64"
         data-cursor-text="Open"
       >
         {photos.map((src, i) => (
@@ -103,13 +59,7 @@ export function TravelPolaroid({
             className="absolute inset-0 m-auto h-fit w-40 rotate-0 rounded-sm border border-black/5 bg-white p-2 pb-8 shadow-[0_12px_30px_-12px_rgb(0_0_0/0.4)] md:w-44"
           >
             <div className="relative aspect-square overflow-hidden">
-              <Image
-                src={src || "/placeholder.svg"}
-                alt=""
-                fill
-                sizes="176px"
-                className="object-cover"
-              />
+              <Image src={src} alt="" fill sizes="176px" className="object-cover" />
             </div>
             {/* The cover print gets a note in the white strip, in navy "ballpoint"
                 that stays the same in dark mode, since the print stays white. */}
@@ -117,116 +67,17 @@ export function TravelPolaroid({
               <p
                 className={`${hand.className} absolute inset-x-0 bottom-1 -rotate-2 text-center text-[17px] leading-none text-[#1f3a68]`}
               >
-                {blog.notePlace ?? blog.location.split(",")[0]}, {scribbledMonth(blog.when)}
+                {trip.notePlace ?? trip.location.split(",")[0]}, {scribbledMonth(trip.when)}
               </p>
             )}
           </motion.div>
         ))}
-      </motion.button>
+      </MotionLink>
 
       <div className="text-center">
-        <p className="text-xl font-semibold italic text-foreground">{blog.title}</p>
-        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          {blog.location}
-        </p>
+        <p className="text-xl font-semibold italic text-foreground">{trip.title}</p>
+        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">{trip.location}</p>
       </div>
-
-      {/*
-       * Portalled to <body> on purpose. This overlay is `position: fixed`, and any
-       * ancestor with a transform, filter, or will-change becomes its containing
-       * block — which silently re-anchors it to that ancestor's box instead of the
-       * viewport. The polaroids sit inside animated wrappers, so escaping the tree
-       * makes it immune to whatever the page does above it.
-       */}
-      {mounted &&
-        createPortal(
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
-              >
-                <motion.div
-                  initial={{ backdropFilter: "blur(0px)" }}
-                  animate={{ backdropFilter: "blur(20px)" }}
-                  exit={{ backdropFilter: "blur(0px)" }}
-                  className="absolute inset-0 bg-black/40"
-                  onClick={() => setIsOpen(false)}
-                />
-
-                <motion.div
-                  layoutId={`trip-${blog.id}`}
-                  className="relative flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[40px] bg-background shadow-2xl"
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsOpen(false);
-                    }}
-                    className="absolute right-6 top-6 z-10 rounded-full bg-black/10 p-2 backdrop-blur-md transition-colors hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-
-                  <ScrollArea className="h-full w-full">
-                    <div className="relative h-[40vh] min-h-[300px] w-full">
-                      <Image
-                        src={blog.heroImage || "/placeholder.svg"}
-                        alt={blog.title}
-                        fill
-                        className="object-cover"
-                        priority
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                    </div>
-
-                    <div className="mx-auto max-w-2xl px-6 py-12 md:px-12">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
-                          {blog.title}
-                        </h1>
-                        <div className="mb-12 flex flex-col gap-1">
-                          <p className="text-lg font-medium text-muted-foreground">{blog.subtitle}</p>
-                          <p className="text-sm font-medium uppercase tracking-wide text-primary/60">
-                            {blog.location}
-                          </p>
-                        </div>
-
-                        <div className="space-y-8">
-                          {blog.sections.map((section, idx) => (
-                            <div key={idx}>
-                              {section.type === "text" ? (
-                                <p className="font-serif text-lg leading-relaxed text-foreground/80">
-                                  {section.content}
-                                </p>
-                              ) : (
-                                <div className="relative my-8 aspect-video overflow-hidden rounded-3xl">
-                                  <Image
-                                    src={section.content || "/placeholder.svg"}
-                                    alt=""
-                                    fill
-                                    className="object-cover"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    </div>
-                  </ScrollArea>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
     </div>
   );
 }

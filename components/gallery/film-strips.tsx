@@ -14,6 +14,7 @@ import {
   useVelocity,
   type MotionValue,
 } from "framer-motion";
+import { LoopingClip } from "@/components/media/looping-clip";
 import { MEDIA, type Media } from "./media";
 
 /**
@@ -270,7 +271,7 @@ function EdgeText({
 }
 
 function FrameMedia({ media, width }: { media: Media; width: number }) {
-  if (media.kind === "video") return <LoopingClip src={media.src} poster={media.poster} />;
+  if (media.kind === "video") return <LoopingClip src={media.src} poster={media.poster} className="size-full object-cover" />;
   return (
     <Image
       src={media.src}
@@ -280,37 +281,6 @@ function FrameMedia({ media, width }: { media: Media; width: number }) {
       // Request only what the frame needs, so there's no big copy to grab.
       sizes={`${width}px`}
       className="pointer-events-none object-cover"
-    />
-  );
-}
-
-/** A silent loop that plays only while on screen, and not at all with reduced motion. */
-function LoopingClip({ src, poster }: { src: string; poster: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const inView = useInView(ref, { margin: "100px" });
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    const video = ref.current;
-    if (!video) return;
-    if (inView && !reducedMotion) video.play().catch(() => {});
-    else video.pause();
-  }, [inView, reducedMotion]);
-
-  return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      muted
-      loop
-      playsInline
-      preload="none"
-      disablePictureInPicture
-      disableRemotePlayback
-      controlsList="nodownload nofullscreen noremoteplayback"
-      tabIndex={-1}
-      className="pointer-events-none size-full object-cover"
     />
   );
 }

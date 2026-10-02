@@ -1,25 +1,31 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { blogData } from "@/types/blog";
 import { RevealGroup, RevealItem } from "@/components/reveal";
 import { TravelMap } from "@/components/travel-map";
 import { TravelPolaroid } from "@/components/travel-polaroid";
 import { SOMEDAY } from "@/types/places";
+import type { Trip } from "@/types/travel";
 
 /**
  * The map and the photo piles are two views of the same trips: hovering a pin
  * fans out its pile, hovering a pile lights up its pin, and clicking either
- * opens the story.
+ * opens the story at /travel/<slug>, over the page.
  */
-export function TravelSection() {
+export function TravelSection({ trips }: { trips: Trip[] }) {
+  const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
 
   return (
     <div className="mt-14 grid items-start gap-16 lg:grid-cols-[minmax(240px,380px)_1fr] lg:gap-20">
       <div className="mx-auto w-full max-w-[380px] lg:sticky lg:top-28">
-        <TravelMap trips={blogData} activeId={hoveredId} onHover={setHoveredId} onSelect={setOpenId} />
+        <TravelMap
+          trips={trips}
+          activeId={hoveredId}
+          onHover={setHoveredId}
+          onSelect={(slug) => router.push(`/travel/${slug}`, { scroll: false })}
+        />
         <p className="mt-4 text-xs uppercase tracking-[0.25em] text-muted-foreground">
           Hover a pin · click to open
         </p>
@@ -42,14 +48,12 @@ export function TravelSection() {
 
       {/* Inset so the hover fan-out never clips at the viewport edge. */}
       <RevealGroup className="flex flex-wrap justify-center gap-x-24 gap-y-16 px-6 md:px-16 lg:justify-start">
-        {blogData.map((blog) => (
-          <RevealItem key={blog.id}>
+        {trips.map((trip) => (
+          <RevealItem key={trip.slug}>
             <TravelPolaroid
-              blog={blog}
-              highlighted={hoveredId === blog.id}
-              onHoverChange={(hovered) => setHoveredId(hovered ? blog.id : null)}
-              open={openId === blog.id}
-              onOpenChange={(open) => setOpenId(open ? blog.id : null)}
+              trip={trip}
+              highlighted={hoveredId === trip.slug}
+              onHoverChange={(hovered) => setHoveredId(hovered ? trip.slug : null)}
             />
           </RevealItem>
         ))}
