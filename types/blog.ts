@@ -5,6 +5,12 @@ export interface BlogContent {
     location: string
     /** Where the pin goes on the travel map. */
     coords: { lat: number; lng: number }
+    /** Which side of its pin the map label sits, when the default would collide. */
+    mapLabelSide?: "left" | "right"
+    /** Month of the trip, as YYYY-MM. */
+    when: string
+    /** Place for the handwritten note on the polaroid, when the location's first part is too long. */
+    notePlace?: string
     heroImage: string
     thumbnails: string[]
     sections: Array<{
@@ -20,6 +26,7 @@ export const blogData: BlogContent[] = [
         subtitle: "Mountains, friends, and slow mornings",
         location: "Tulga, Himachal Pradesh, India",
         coords: { lat: 32.02, lng: 77.43 },
+        when: "2024-12",
         heroImage: "/travel/t1.JPG",
         thumbnails: [
             "/travel/t1.JPG",
@@ -68,6 +75,8 @@ export const blogData: BlogContent[] = [
         subtitle: "Trek trails, cricket nights, and mountain streets",
         location: "Dharamshala, Himachal Pradesh, India",
         coords: { lat: 32.22, lng: 76.32 },
+        mapLabelSide: "left",
+        when: "2023-10",
         heroImage: "/travel/df1.JPG",
         thumbnails: [
             "/travel/df1.JPG",
@@ -97,7 +106,7 @@ export const blogData: BlogContent[] = [
             {
                 type: "text",
                 content:
-                    "Back in the city, we watched the India vs New Zealand final together. The atmosphere was electric — cheers, nervous silences, and that collective excitement you only get during big matches. It felt special sharing that moment in the mountains.",
+                    "Back in the city, we watched the India vs New Zealand match together. The atmosphere was electric — cheers, nervous silences, and that collective excitement you only get during big matches. It felt special sharing that moment in the mountains.",
             },
             {
                 type: "image",
@@ -116,6 +125,8 @@ export const blogData: BlogContent[] = [
         subtitle: "A family trip through Dehradun and Mussoorie",
         location: "Dehradun & Mussoorie, Uttarakhand, India",
         coords: { lat: 30.4, lng: 78.05 },
+        when: "2026-06",
+        notePlace: "Mussoorie",
         heroImage: "/travel/dm2.jpg",
         thumbnails: ["/travel/dm2.jpg", "/travel/dm1.jpg"],
         sections: [
@@ -150,6 +161,7 @@ export const blogData: BlogContent[] = [
         subtitle: "A monsoon Rakshabandhan trip to Palolem with Di",
         location: "Palolem, South Goa, India",
         coords: { lat: 15.01, lng: 74.02 },
+        when: "2026-08",
         heroImage: "/travel/goa1.jpg",
         thumbnails: ["/travel/goa2.jpg", "/travel/goa1.jpg"],
         sections: [

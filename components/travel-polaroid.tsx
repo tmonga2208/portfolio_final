@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Caveat } from "next/font/google";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -10,6 +11,16 @@ import { useIsClient } from "@/hooks/use-is-client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Handwriting for the note on the cover print. */
+const hand = Caveat({ subsets: ["latin"], weight: "500", display: "swap" });
+
+/** "2026-08" → "Aug '26", the way you'd scribble it on a print. */
+function scribbledMonth(when: string) {
+  const [year, month] = when.split("-").map(Number);
+  const name = new Date(Date.UTC(year, month - 1)).toLocaleString("en", { month: "short", timeZone: "UTC" });
+  return `${name} '${String(year).slice(2)}`;
+}
 
 /** Back-to-front: two photos peeking out behind, the cover on top. */
 const CARD_POSES = [
@@ -100,6 +111,15 @@ export function TravelPolaroid({
                 className="object-cover"
               />
             </div>
+            {/* The cover print gets a note in the white strip, in navy "ballpoint"
+                that stays the same in dark mode, since the print stays white. */}
+            {i === photos.length - 1 && (
+              <p
+                className={`${hand.className} absolute inset-x-0 bottom-1 -rotate-2 text-center text-[17px] leading-none text-[#1f3a68]`}
+              >
+                {blog.notePlace ?? blog.location.split(",")[0]}, {scribbledMonth(blog.when)}
+              </p>
+            )}
           </motion.div>
         ))}
       </motion.button>
