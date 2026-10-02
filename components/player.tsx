@@ -41,6 +41,10 @@ declare global {
 const PLAYLIST_ID = process.env.NEXT_PUBLIC_SPOTIFY_PLAYLIST_ID || "5zm54nM2Y2gEGS3VeWF3vY";
 const HIDDEN_KEY = "player:hidden";
 export const PLAYER_TOGGLE_EVENT = "player:toggle";
+// Asks the player to play `uri`, queued within `uris`. The player cancels the
+// event when it takes the request, so the sender knows to skip its fallback.
+export const PLAYER_PLAY_EVENT = "player:play";
+export type PlayerPlayDetail = { uri: string; uris?: string[] };
 const VOLUME_KEY = "player:volume";
 
 // Rewinding past this point in a track restarts it instead of stepping back,
@@ -349,7 +353,7 @@ export function Player() {
         };
     }, [expanded]);
 
-    const playTrack = async (trackUri?: string, playlistUri?: string) => {
+    const playTrack = async (trackUri?: string, playlistUri?: string, uris?: string[]) => {
         if (!deviceId) return;
 
         try {
@@ -360,6 +364,9 @@ export function Player() {
 
             if (playlistUri) {
                 body.context_uri = playlistUri;
+                if (trackUri) body.offset = { uri: trackUri };
+            } else if (uris?.length) {
+                body.uris = uris;
                 if (trackUri) body.offset = { uri: trackUri };
             } else if (trackUri) {
                 body.uris = [trackUri];
@@ -466,6 +473,24 @@ export function Player() {
         const onToggle = () => handleExternalToggle.current();
         window.addEventListener(PLAYER_TOGGLE_EVENT, onToggle);
         return () => window.removeEventListener(PLAYER_TOGGLE_EVENT, onToggle);
+    }, []);
+
+    // Lets other sections (like On Repeat) play a track here. Only claims the
+    // request when the browser player can actually play it.
+    const handleExternalPlay = useRef<(e: Event) => void>(() => {});
+    useEffect(() => {
+        handleExternalPlay.current = (e) => {
+            if (!isPlayerReady || !deviceId) return;
+            const { uri, uris } = (e as CustomEvent<PlayerPlayDetail>).detail;
+            e.preventDefault();
+            showPlayer();
+            playTrack(uri, undefined, uris);
+        };
+    });
+    useEffect(() => {
+        const onPlay = (e: Event) => handleExternalPlay.current(e);
+        window.addEventListener(PLAYER_PLAY_EVENT, onPlay);
+        return () => window.removeEventListener(PLAYER_PLAY_EVENT, onPlay);
     }, []);
 
     const isPlaying = mode === "sdk" ? !isPaused : mode === "remote" ? Boolean(nowPlaying?.isPlaying) : false;

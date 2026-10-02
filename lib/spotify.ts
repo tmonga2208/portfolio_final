@@ -142,6 +142,7 @@ export async function getTopTracks(limit = 5) {
         // Images come largest first; the ~300px one is plenty for a thumbnail.
         albumImageUrl: track.album.images[1]?.url ?? track.album.images[0]?.url,
         songUrl: track.external_urls.spotify,
+        uri: track.uri,
     }));
 }
 
