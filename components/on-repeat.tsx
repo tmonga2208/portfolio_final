@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
+import { PLAYER_PLAY_EVENT, type PlayerPlayDetail } from "@/components/player";
 
-type Track = { title: string; artist: string; albumImageUrl?: string; songUrl: string };
+type Track = { title: string; artist: string; albumImageUrl?: string; songUrl: string; uri?: string };
 
 /**
  * Tarun's most-played tracks lately, from Spotify. Renders nothing until
@@ -29,6 +30,18 @@ export function OnRepeat() {
 
   if (!tracks.length) return null;
 
+  // Play in the site's player when it can; otherwise (or on a modified click)
+  // the link opens the track on Spotify as usual.
+  const playHere = (e: MouseEvent<HTMLAnchorElement>, track: Track) => {
+    if (!track.uri || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    const detail: PlayerPlayDetail = {
+      uri: track.uri,
+      uris: tracks.flatMap((t) => (t.uri ? [t.uri] : [])),
+    };
+    const claimed = !window.dispatchEvent(new CustomEvent(PLAYER_PLAY_EVENT, { detail, cancelable: true }));
+    if (claimed) e.preventDefault();
+  };
+
   return (
     <aside className="mt-6 rounded-2xl border border-border p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
@@ -42,6 +55,7 @@ export function OnRepeat() {
               href={track.songUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => playHere(e, track)}
               className="group flex items-center gap-3 lg:flex-col lg:items-start"
             >
               <span className="relative size-14 shrink-0 overflow-hidden rounded-md bg-muted lg:aspect-square lg:size-auto lg:w-full">
