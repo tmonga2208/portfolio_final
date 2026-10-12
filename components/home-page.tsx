@@ -35,9 +35,9 @@ const WORK: ShowcaseEntry[] = [
       "Complete brand build for a sports retailer — website, logo, visiting cards, and a consistent identity across social platforms.",
     tags: ["Web Design", "Branding", "Logo Design", "Social Media"],
     images: [
-      { src: "/chauhan/image.png", alt: "Chauhan Sports - Screenshot 1" },
-      { src: "/chauhan/img2.png", alt: "Chauhan Sports - Screenshot 2" },
-      { src: "/chauhan/img3.png", alt: "Chauhan Sports - Screenshot 3" },
+      { src: "/chauhan/home.png", alt: "Chauhan Sports home page" },
+      { src: "/chauhan/catalogue.png", alt: "Chauhan Sports product carousel" },
+      { src: "/chauhan/departments.png", alt: "Chauhan Sports departments" },
     ],
   },
   {
@@ -59,27 +59,29 @@ const PROJECTS: ShowcaseEntry[] = [
   {
     title: "Forgestack",
     url: "https://forgestack.vercel.app/",
+    repo: "https://github.com/tmonga2208/create-forgestack",
     period: "January 2025 — Present",
     blurb:
       "A full-stack starter framework with a guided CLI and opinionated defaults — from empty folder to real features, faster.",
     tags: ["TypeScript", "CLI", "Full-stack", "Open Source"],
     images: [
-      { src: "/forge/i1.png", alt: "Forgestack - Screenshot 1" },
+      { src: "/forge/home.png", alt: "Forgestack home page" },
       { src: "/forge/i2.png", alt: "Forgestack - Screenshot 2" },
       { src: "/forge/i3.png", alt: "Forgestack - Screenshot 3" },
     ],
   },
   {
     title: "SubPIP",
-    url: "https://subpip.vercel.app/",
+    url: "https://subpip.online",
+    repo: "https://github.com/tmonga2208/Subpip",
     period: "January 2025",
     blurb:
       "A floating always-on-top video player with playback controls and seamlessly integrated subtitles.",
     tags: ["React", "Picture-in-Picture", "Subtitles"],
     images: [
-      { src: "/subpip/i1.png", alt: "SubPIP - Screenshot 1" },
-      { src: "/subpip/i2.png", alt: "SubPIP - Screenshot 2" },
-      { src: "/subpip/i3.png", alt: "SubPIP - Screenshot 3" },
+      { src: "/subpip/home.png", alt: "SubPIP home page" },
+      { src: "/subpip/demos.png", alt: "SubPIP demo recordings" },
+      { src: "/subpip/closer-look.png", alt: "SubPIP window and popup" },
     ],
   },
 ];

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Github, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useIsClient } from "@/hooks/use-is-client";
@@ -13,6 +13,8 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 export type ShowcaseEntry = {
   title: string;
   url: string;
+  /** Source repository, for work whose code is public. */
+  repo?: string;
   period: string;
   blurb: string;
   tags: string[];
@@ -182,15 +184,29 @@ export function ShowcaseList({
                           </span>
                         ))}
                       </div>
-                      <Link
-                        href={entry.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="link-underline mt-auto inline-flex w-fit items-center gap-1 font-semibold text-brand"
-                      >
-                        Visit site
-                        <ArrowUpRight className="size-4" />
-                      </Link>
+                      {/* .link-underline is unlayered and sets inline-block, hence the forced flex. */}
+                      <div className="mt-auto flex flex-wrap gap-x-6 gap-y-2">
+                        <Link
+                          href={entry.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link-underline inline-flex! w-fit items-center gap-1 font-semibold text-brand"
+                        >
+                          Visit site
+                          <ArrowUpRight className="size-4" />
+                        </Link>
+                        {entry.repo && (
+                          <Link
+                            href={entry.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-underline inline-flex! w-fit items-center gap-1.5 font-semibold text-brand"
+                          >
+                            <Github className="size-4" />
+                            Source
+                          </Link>
+                        )}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
