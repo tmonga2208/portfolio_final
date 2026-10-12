@@ -52,8 +52,8 @@ function sectionInView(): string | null {
 const MENU_ITEMS: (NavItem & { image: string })[] = [
   { label: "About", section: "about", image: "/img5.jpeg" },
   { label: "Experience", section: "experience", image: "/resolute/i1.png" },
-  { label: "Work", section: "work", image: "/chauhan/image.png" },
-  { label: "Projects", section: "projects", image: "/forge/i1.png" },
+  { label: "Work", section: "work", image: "/chauhan/home.png" },
+  { label: "Projects", section: "projects", image: "/forge/home.png" },
   { label: "Travel", section: "travel", image: "/travel/t1.JPG" },
   { label: "Gallery", section: "gallery", image: "/gallery/g05.jpg" },
   { label: "Library", href: "/library", image: "/img3.JPG" },
