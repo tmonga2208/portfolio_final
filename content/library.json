@@ -1,0 +1,361 @@
+[
+  {
+    "id": 1,
+    "title": "Percy Jackson and the Lightning Thief",
+    "author": "Rick Riordan",
+    "series": "Percy Jackson & the Olympians",
+    "coverUrl": "/library/percy-jackson-and-the-lightning-thief.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Percy+Jackson+and+the+Lightning+Thief"
+  },
+  {
+    "id": 2,
+    "title": "Percy Jackson and the Sea of Monsters",
+    "author": "Rick Riordan",
+    "series": "Percy Jackson & the Olympians",
+    "coverUrl": "/library/percy-jackson-and-the-sea-of-monsters.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Percy+Jackson+and+the+Sea+of+Monsters"
+  },
+  {
+    "id": 3,
+    "title": "Percy Jackson and the Titan’s Curse",
+    "author": "Rick Riordan",
+    "series": "Percy Jackson & the Olympians",
+    "coverUrl": "/library/percy-jackson-and-the-titans-curse.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Percy+Jackson+and+the+Titan%27s+Curse"
+  },
+  {
+    "id": 4,
+    "title": "Percy Jackson and the Battle of the Labyrinth",
+    "author": "Rick Riordan",
+    "series": "Percy Jackson & the Olympians",
+    "coverUrl": "/library/percy-jackson-and-the-battle-of-the-labyrinth.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Percy+Jackson+and+the+Battle+of+the+Labyrinth"
+  },
+  {
+    "id": 5,
+    "title": "Percy Jackson and the Last Olympian",
+    "author": "Rick Riordan",
+    "series": "Percy Jackson & the Olympians",
+    "coverUrl": "/library/percy-jackson-and-the-last-olympian.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Percy+Jackson+and+the+Last+Olympian"
+  },
+  {
+    "id": 6,
+    "title": "The Lost Hero",
+    "author": "Rick Riordan",
+    "series": "The Heroes of Olympus",
+    "coverUrl": "/library/the-lost-hero.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Lost+Hero+Rick+Riordan"
+  },
+  {
+    "id": 7,
+    "title": "The Son of Neptune",
+    "author": "Rick Riordan",
+    "series": "The Heroes of Olympus",
+    "coverUrl": "/library/the-son-of-neptune.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Son+of+Neptune+Rick+Riordan"
+  },
+  {
+    "id": 8,
+    "title": "The Mark of Athena",
+    "author": "Rick Riordan",
+    "series": "The Heroes of Olympus",
+    "coverUrl": "/library/the-mark-of-athena.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Mark+of+Athena+Rick+Riordan"
+  },
+  {
+    "id": 9,
+    "title": "The House of Hades",
+    "author": "Rick Riordan",
+    "series": "The Heroes of Olympus",
+    "coverUrl": "/library/the-house-of-hades.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+House+of+Hades+Rick+Riordan"
+  },
+  {
+    "id": 10,
+    "title": "The Blood of Olympus",
+    "author": "Rick Riordan",
+    "series": "The Heroes of Olympus",
+    "coverUrl": "/library/the-blood-of-olympus.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Blood+of+Olympus+Rick+Riordan"
+  },
+  {
+    "id": 11,
+    "title": "Harry Potter and the Philosopher’s Stone",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-philosophers-stone.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Philosopher%27s+Stone"
+  },
+  {
+    "id": 12,
+    "title": "Harry Potter and the Chamber of Secrets",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-chamber-of-secrets.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Chamber+of+Secrets"
+  },
+  {
+    "id": 13,
+    "title": "Harry Potter and the Prisoner of Azkaban",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-prisoner-of-azkaban.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Prisoner+of+Azkaban"
+  },
+  {
+    "id": 14,
+    "title": "Harry Potter and the Goblet of Fire",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-goblet-of-fire.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Goblet+of+Fire"
+  },
+  {
+    "id": 15,
+    "title": "Harry Potter and the Order of the Phoenix",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-order-of-the-phoenix.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Order+of+the+Phoenix"
+  },
+  {
+    "id": 16,
+    "title": "Harry Potter and the Half-Blood Prince",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-half-blood-prince.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Half-Blood+Prince"
+  },
+  {
+    "id": 17,
+    "title": "Harry Potter and the Deathly Hallows",
+    "author": "J.K. Rowling",
+    "series": "Harry Potter",
+    "coverUrl": "/library/harry-potter-and-the-deathly-hallows.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Harry+Potter+and+the+Deathly+Hallows"
+  },
+  {
+    "id": 18,
+    "title": "The Hidden Oracle",
+    "author": "Rick Riordan",
+    "series": "The Trials of Apollo",
+    "coverUrl": "/library/the-hidden-oracle.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Hidden+Oracle+Rick+Riordan"
+  },
+  {
+    "id": 19,
+    "title": "The Dark Prophecy",
+    "author": "Rick Riordan",
+    "series": "The Trials of Apollo",
+    "coverUrl": "/library/the-dark-prophecy.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Dark+Prophecy+Rick+Riordan"
+  },
+  {
+    "id": 20,
+    "title": "The Burning Maze",
+    "author": "Rick Riordan",
+    "series": "The Trials of Apollo",
+    "coverUrl": "/library/the-burning-maze.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Burning+Maze+Rick+Riordan"
+  },
+  {
+    "id": 21,
+    "title": "The Tyrant’s Tomb",
+    "author": "Rick Riordan",
+    "series": "The Trials of Apollo",
+    "coverUrl": "/library/the-tyrants-tomb.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Tyrant%27s+Tomb+Rick+Riordan"
+  },
+  {
+    "id": 22,
+    "title": "The Tower of Nero",
+    "author": "Rick Riordan",
+    "series": "The Trials of Apollo",
+    "coverUrl": "/library/the-tower-of-nero.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Tower+of+Nero+Rick+Riordan"
+  },
+  {
+    "id": 23,
+    "title": "The Red Pyramid",
+    "author": "Rick Riordan",
+    "series": "The Kane Chronicles",
+    "coverUrl": "/library/the-red-pyramid.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Red+Pyramid+Rick+Riordan"
+  },
+  {
+    "id": 24,
+    "title": "The Throne of Fire",
+    "author": "Rick Riordan",
+    "series": "The Kane Chronicles",
+    "coverUrl": "/library/the-throne-of-fire.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Throne+of+Fire+Rick+Riordan"
+  },
+  {
+    "id": 25,
+    "title": "The Serpent’s Shadow",
+    "author": "Rick Riordan",
+    "series": "The Kane Chronicles",
+    "coverUrl": "/library/the-serpents-shadow.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Serpent%27s+Shadow+Rick+Riordan"
+  },
+  {
+    "id": 26,
+    "title": "The Sword of Summer",
+    "author": "Rick Riordan",
+    "series": "Magnus Chase and the Gods of Asgard",
+    "coverUrl": "/library/the-sword-of-summer.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Sword+of+Summer+Rick+Riordan"
+  },
+  {
+    "id": 27,
+    "title": "The Hammer of Thor",
+    "author": "Rick Riordan",
+    "series": "Magnus Chase and the Gods of Asgard",
+    "coverUrl": "/library/the-hammer-of-thor.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Hammer+of+Thor+Rick+Riordan"
+  },
+  {
+    "id": 28,
+    "title": "The Ship of the Dead",
+    "author": "Rick Riordan",
+    "series": "Magnus Chase and the Gods of Asgard",
+    "coverUrl": "/library/the-ship-of-the-dead.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Ship+of+the+Dead+Rick+Riordan"
+  },
+  {
+    "id": 29,
+    "title": "Aru Shah and the End of Time",
+    "author": "Roshani Chokshi",
+    "series": "The Pandava Quintet",
+    "coverUrl": "/library/aru-shah-and-the-end-of-time.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Aru+Shah+and+the+End+of+Time"
+  },
+  {
+    "id": 30,
+    "title": "Aru Shah and the Song of Death",
+    "author": "Roshani Chokshi",
+    "series": "The Pandava Quintet",
+    "coverUrl": "/library/aru-shah-and-the-song-of-death.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Aru+Shah+and+the+Song+of+Death"
+  },
+  {
+    "id": 31,
+    "title": "Aru Shah and the Tree of Wishes",
+    "author": "Roshani Chokshi",
+    "series": "The Pandava Quintet",
+    "coverUrl": "/library/aru-shah-and-the-tree-of-wishes.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Aru+Shah+and+the+Tree+of+Wishes"
+  },
+  {
+    "id": 32,
+    "title": "Aru Shah and the City of Gold",
+    "author": "Roshani Chokshi",
+    "series": "The Pandava Quintet",
+    "coverUrl": "/library/aru-shah-and-the-city-of-gold.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Aru+Shah+and+the+City+of+Gold"
+  },
+  {
+    "id": 33,
+    "title": "Aru Shah and the Nectar of Immortality",
+    "author": "Roshani Chokshi",
+    "series": "The Pandava Quintet",
+    "coverUrl": "/library/aru-shah-and-the-nectar-of-immortality.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Aru+Shah+and+the+Nectar+of+Immortality"
+  },
+  {
+    "id": 34,
+    "title": "Tristan Strong Punches a Hole in the Sky",
+    "author": "Kwame Mbalia",
+    "series": "Tristan Strong",
+    "coverUrl": "/library/tristan-strong-punches-a-hole-in-the-sky.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Tristan+Strong+Punches+a+Hole+in+the+Sky"
+  },
+  {
+    "id": 35,
+    "title": "Tristan Strong Destroys the World",
+    "author": "Kwame Mbalia",
+    "series": "Tristan Strong",
+    "coverUrl": "/library/tristan-strong-destroys-the-world.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Tristan+Strong+Destroys+the+World"
+  },
+  {
+    "id": 36,
+    "title": "Tristan Strong Keeps Punching",
+    "author": "Kwame Mbalia",
+    "series": "Tristan Strong",
+    "coverUrl": "/library/tristan-strong-keeps-punching.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=Tristan+Strong+Keeps+Punching"
+  },
+  {
+    "id": 37,
+    "title": "The Storm Runner",
+    "author": "J.C. Cervantes",
+    "series": "The Storm Runner",
+    "coverUrl": "/library/the-storm-runner.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Storm+Runner+J+C+Cervantes"
+  },
+  {
+    "id": 38,
+    "title": "The Fire Keeper",
+    "author": "J.C. Cervantes",
+    "series": "The Storm Runner",
+    "coverUrl": "/library/the-fire-keeper.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Fire+Keeper+J+C+Cervantes"
+  },
+  {
+    "id": 39,
+    "title": "The Shadow Crosser",
+    "author": "J.C. Cervantes",
+    "series": "The Storm Runner",
+    "coverUrl": "/library/the-shadow-crosser.jpg",
+    "status": "read",
+    "buyLink": "https://www.amazon.in/s?k=The+Shadow+Crosser+J+C+Cervantes"
+  },
+  {
+    "id": 40,
+    "title": "A Beginner's Guide to the Indian Stock Market",
+    "author": "Karthik Rangappa",
+    "coverUrl": "/library/a-beginners-guide-to-the-indian-stock-market.jpg",
+    "status": "reading",
+    "buyLink": "https://www.amazon.in/Beginners-Indian-Creator-Zerodha-Varsity/dp/936989876X"
+  }
+]
