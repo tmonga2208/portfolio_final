@@ -357,5 +357,13 @@
     "coverUrl": "/library/a-beginners-guide-to-the-indian-stock-market.jpg",
     "status": "reading",
     "buyLink": "https://www.amazon.in/Beginners-Indian-Creator-Zerodha-Varsity/dp/936989876X"
+  },
+  {
+    "id": 41,
+    "title": "The Sun and the Star",
+    "author": "Rick Riordan, Mark Oshiro",
+    "coverUrl": "/library/the-sun-and-the-star-41.jpg",
+    "status": "reading",
+    "buyLink": "https://www.amazon.in/s?k=The%20Sun%20and%20the%20Star%20Rick%20Riordan%2C%20Mark%20Oshiro"
   }
 ]
