@@ -49,8 +49,52 @@ function CompanyName({ entry }: { entry: Experience }) {
     );
 }
 
+/** Where each print lands in the pile, as a share of the pile's own box. */
+const PILE = [
+    { left: "0%", top: "0%", width: "50%", rotate: "-5deg", z: 1 },
+    { left: "46%", top: "13%", width: "54%", rotate: "4deg", z: 2 },
+    { left: "15%", top: "45%", width: "46%", rotate: "-2deg", z: 3 },
+] as const;
+
+/**
+ * Snapshots from the job as prints dropped on a desk: overlapping, each a little
+ * askew. Hovering one straightens it and lifts it to the top of the pile.
+ */
+function PhotoPile({ photos }: { photos: NonNullable<Experience["photos"]> }) {
+    return (
+        <div className="relative mt-12 aspect-[10/11] w-full max-w-[340px] lg:mt-0 lg:w-[min(36vw,520px)] lg:max-w-none">
+            {photos.slice(0, PILE.length).map((photo, i) => {
+                const spot = PILE[i];
+                return (
+                    <div
+                        key={photo.src}
+                        style={{
+                            left: spot.left,
+                            top: spot.top,
+                            width: spot.width,
+                            zIndex: spot.z,
+                            ["--tilt" as string]: spot.rotate,
+                        }}
+                        className="absolute rotate-[var(--tilt)] rounded-sm bg-white p-1.5 shadow-lg shadow-black/20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:!z-10 hover:rotate-0 hover:scale-105 md:p-2 dark:bg-neutral-200"
+                    >
+                        <Image
+                            src={photo.src}
+                            alt={photo.alt}
+                            width={photo.width}
+                            height={photo.height}
+                            sizes="(min-width: 1024px) 280px, 180px"
+                            className="aspect-[3/4] w-full object-cover"
+                        />
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
 /** One company on the timeline: node + drawn-in rail on the left, content beside it. */
 function TimelineEntry({ entry }: { entry: Experience }) {
+    const hasPhotos = !!entry.photos?.length;
     return (
         <article className="relative flex gap-6 md:gap-10">
             {/* Rail: the node sits on a line that draws itself down the entry. */}
@@ -69,7 +113,7 @@ function TimelineEntry({ entry }: { entry: Experience }) {
             <Reveal
                 className={cn(
                     "min-w-0 flex-1 pb-16 md:pb-20",
-                    entry.photo && "lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-14"
+                    hasPhotos && "lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-14"
                 )}
             >
               <div className="min-w-0">
@@ -146,16 +190,7 @@ function TimelineEntry({ entry }: { entry: Experience }) {
                 )}
               </div>
 
-                {entry.photo && (
-                    <Image
-                        src={entry.photo.src}
-                        alt={entry.photo.alt}
-                        width={entry.photo.width}
-                        height={entry.photo.height}
-                        sizes="(min-width: 1024px) 260px, 208px"
-                        className="mt-10 w-52 rotate-2 rounded-sm border-[6px] border-white shadow-lg shadow-black/15 lg:mt-2 lg:w-[260px] dark:border-neutral-200"
-                    />
-                )}
+                {hasPhotos && <PhotoPile photos={entry.photos!} />}
             </Reveal>
         </article>
     );
