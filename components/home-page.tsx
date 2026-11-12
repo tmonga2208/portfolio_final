@@ -76,12 +76,25 @@ const PROJECTS: ShowcaseEntry[] = [
     repo: "https://github.com/tmonga2208/Subpip",
     period: "January 2025",
     blurb:
-      "A floating always-on-top video player with playback controls and seamlessly integrated subtitles.",
-    tags: ["React", "Picture-in-Picture", "Subtitles"],
+      "A floating always-on-top video player with playback controls and seamlessly integrated subtitles. It has made money, too.",
+    tags: ["React", "Picture-in-Picture", "Subtitles", "Revenue"],
     images: [
       { src: "/subpip/home.png", alt: "SubPIP home page" },
       { src: "/subpip/demos.png", alt: "SubPIP demo recordings" },
       { src: "/subpip/closer-look.png", alt: "SubPIP window and popup" },
+    ],
+  },
+  {
+    title: "StillBlock",
+    url: "https://stillpage-sigma.vercel.app",
+    period: "November 2026",
+    blurb:
+      "A browser extension that blocks ads, trackers and malware sites, then hides the empty spaces they leave behind. No account, and nothing leaves your browser.",
+    tags: ["Browser Extension", "WXT", "TypeScript", "Privacy"],
+    images: [
+      { src: "/stillblock/home.png", alt: "StillBlock home page" },
+      { src: "/stillblock/demo.png", alt: "StillBlock demo on a mock news page" },
+      { src: "/stillblock/plans.png", alt: "StillBlock Free and Pro plans" },
     ],
   },
 ];
