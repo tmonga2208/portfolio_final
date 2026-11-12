@@ -15,6 +15,8 @@ export type ShowcaseEntry = {
   url: string;
   /** Source repository, for work whose code is public. */
   repo?: string;
+  /** Marks a fresh launch with a "New" badge beside the title. */
+  isNew?: boolean;
   period: string;
   blurb: string;
   tags: string[];
@@ -140,6 +142,11 @@ export function ShowcaseList({
                 )}
               >
                 {entry.title}
+                {entry.isNew && (
+                  <span className="ml-3 inline-block -translate-y-[0.9em] rounded-full border border-brand px-2.5 py-1 align-middle font-sans text-[10px] font-semibold uppercase leading-none tracking-[0.2em] text-brand md:ml-4 md:-translate-y-[1.4em] md:text-xs">
+                    New
+                  </span>
+                )}
               </h3>
 
               {/* Touch screens get no hover preview, so show the first screenshot inline.

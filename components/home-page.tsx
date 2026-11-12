@@ -87,6 +87,7 @@ const PROJECTS: ShowcaseEntry[] = [
   {
     title: "StillBlock",
     url: "https://stillpage-sigma.vercel.app",
+    isNew: true,
     period: "November 2026",
     blurb:
       "A browser extension that blocks ads, trackers and malware sites, then hides the empty spaces they leave behind. No account, and nothing leaves your browser.",
