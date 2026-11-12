@@ -21,8 +21,11 @@ export interface Experience {
     /** Concrete things shipped. Keep them specific and outcome-shaped. */
     highlights?: string[];
     stack?: string[];
-    /** A snapshot from the job, shown small beside the entry. Run `npm run photos` on it first. */
-    photo?: { src: string; width: number; height: number; alt: string };
+    /**
+     * Up to three snapshots from the job, shown as a loose pile of prints beside
+     * the entry. Portrait, 3:4. Run `npm run photos` on each first.
+     */
+    photos?: { src: string; width: number; height: number; alt: string }[];
 }
 
 export const experienceData: Experience[] = [
@@ -44,11 +47,25 @@ export const experienceData: Experience[] = [
             "Used GitHub Copilot to move faster, and kept technical documentation in Markdown so the team could pick the work up without me.",
         ],
         stack: ["React", "TypeScript", "REST APIs", "SQL", "Selenium", "Java", "CI/CD", "Jira"],
-        photo: {
-            src: "/experience/iot83-desk.jpg",
-            width: 750,
-            height: 1000,
-            alt: "My desk at work: laptop on the sign-in screen, backpack, and my ID card in hand",
-        },
+        photos: [
+            {
+                src: "/experience/iot83-desk.jpg",
+                width: 750,
+                height: 1000,
+                alt: "My desk at work: laptop on the sign-in screen, backpack, and my ID card in hand",
+            },
+            {
+                src: "/experience/iot83-mirror.jpg",
+                width: 750,
+                height: 1000,
+                alt: "Mirror selfie on the way to the office, thumbs up, backpack on",
+            },
+            {
+                src: "/experience/iot83-lanyard.jpg",
+                width: 750,
+                height: 1000,
+                alt: "An Eaton lanyard looped over my open hand",
+            },
+        ],
     },
 ];
