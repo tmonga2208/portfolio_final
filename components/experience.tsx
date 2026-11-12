@@ -66,7 +66,13 @@ function TimelineEntry({ entry }: { entry: Experience }) {
                 <span className="relative z-10 mt-1 size-3.5 rounded-full bg-brand" />
             </div>
 
-            <Reveal className="min-w-0 flex-1 pb-16 md:pb-20">
+            <Reveal
+                className={cn(
+                    "min-w-0 flex-1 pb-16 md:pb-20",
+                    entry.photo && "lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-14"
+                )}
+            >
+              <div className="min-w-0">
                 <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
                     {entry.period}
                     {entry.location && (
@@ -137,6 +143,18 @@ function TimelineEntry({ entry }: { entry: Experience }) {
                             </li>
                         ))}
                     </ul>
+                )}
+              </div>
+
+                {entry.photo && (
+                    <Image
+                        src={entry.photo.src}
+                        alt={entry.photo.alt}
+                        width={entry.photo.width}
+                        height={entry.photo.height}
+                        sizes="(min-width: 1024px) 260px, 208px"
+                        className="mt-10 w-52 rotate-2 rounded-sm border-[6px] border-white shadow-lg shadow-black/15 lg:mt-2 lg:w-[260px] dark:border-neutral-200"
+                    />
                 )}
             </Reveal>
         </article>

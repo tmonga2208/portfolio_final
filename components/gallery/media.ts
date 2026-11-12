@@ -28,4 +28,5 @@ export const MEDIA: Media[] = [
   { src: "/gallery/g12.jpg", width: 591, height: 800, caption: "Cutest kid me" },
   { src: "/gallery/g10.jpg", width: 800, height: 549, caption: "Mom & Dad's 25th anniversary" },
   { src: "/gallery/g11.jpg", width: 800, height: 599, caption: "Best trip memory" },
+  { src: "/gallery/g13.jpg", width: 600, height: 800, caption: "Graduated" },
 ];
