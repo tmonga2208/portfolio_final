@@ -85,6 +85,20 @@ const PROJECTS: ShowcaseEntry[] = [
     ],
   },
   {
+    title: "Synítheia",
+    url: "https://synitheia.vercel.app",
+    repo: "https://github.com/tmonga2208/synitheia",
+    period: "July 2026 — Present",
+    blurb:
+      "A daily app for Android and iPhone that puts habits, spending, meals, water and health on one timeline. It notices patterns, shows its evidence and asks before it records anything.",
+    tags: ["React Native", "Expo", "Fastify", "MongoDB"],
+    images: [
+      { src: "/synitheia/home.png", alt: "Synítheia home page" },
+      { src: "/synitheia/timeline.png", alt: "Synítheia day timeline" },
+      { src: "/synitheia/your-data.png", alt: "Synítheia data source switches" },
+    ],
+  },
+  {
     title: "StillBlock",
     url: "https://stillpage-sigma.vercel.app",
     isNew: true,
